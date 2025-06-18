@@ -1,0 +1,8 @@
+openvino
+opencv-python
+numpy
+torch
+torchaudio
+transformers
+gradio
+scikit-learn
