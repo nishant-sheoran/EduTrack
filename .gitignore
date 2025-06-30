@@ -1,5 +1,4 @@
 test_images/
 myenv2/
 models/__pycache__/
-models/weights/
 models/__pycache__/face_detection.cpython-313.pyc

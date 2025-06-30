@@ -1,0 +1,1 @@
+def __init__(self, model_xml_path=r'models\weights\intel\emotions-recognition-retail-0003\FP32\emotions-recognition-retail-0003.xml', model_bin_path=r'models\weights\intel\emotions-recognition-retail-0003\FP32\emotions-recognition-retail-0003.bin'):
