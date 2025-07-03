@@ -1,10 +1,7 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-from datetime import datetime, timedelta
-import random
+import requests
+from datetime import datetime
 
 # --- Page Config ---
 st.set_page_config(
@@ -25,9 +22,6 @@ st.markdown("""
         padding: 1.2rem 0 2rem 0;
         margin-bottom: 0.5rem;
     }
-    [data-theme="dark"] .main-header {
-        color: #fff;
-    }
     .section-header {
         font-size: 1.4rem;
         font-weight: 700;
@@ -36,47 +30,20 @@ st.markdown("""
         align-items: center;
         margin-bottom: 0.7rem;
     }
-    [data-theme="dark"] .section-header {
-        color: #fff;
-    }
     .metric-title {
         font-size: 1.1rem;
         font-weight: 600;
         color: #fff;
         margin-bottom: 0.2rem;
     }
-    [data-theme="dark"] .metric-title {
-        color: #bbb;
-    }
-    .metric-value {
-        font-size: 2.1rem;
-        font-weight: 700;
-        color: #00e676;
-        margin-bottom: 0.1rem;
-    }
-    .metric-delta-pos {
-        font-size: 1rem;
-        font-weight: 500;
-        color: #00bfae;
-    }
-    .metric-delta-neg {
-        font-size: 1rem;
-        font-weight: 500;
-        color: #ff1744;
-    }
-    .metric-caption {
-        font-size: 0.95rem;
-        color: #999;
-        margin-bottom: 0.5rem;
-    }
-    [data-theme="dark"] .metric-caption {
-        color: #bbb;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # --- Main Header ---
 st.markdown('<div class="main-header">EduTrack Teacher Dashboard</div>', unsafe_allow_html=True)
+
+# --- Debug Toggle ---
+debug = st.sidebar.checkbox("Show debug info (for backend engineers)")
 
 # --- Teacher Inputs ---
 col_strength, col_subject = st.columns([1, 2])
@@ -85,184 +52,128 @@ with col_strength:
 with col_subject:
     subject_name = st.text_input("Subject Being Taught", value="Mathematics")
 
-# --- Generate Sample Data ---
-@st.cache_data
-def generate_sample_data():
-    dates = pd.date_range(start='2024-01-01', end='2024-01-31', freq='D')
-    engagement_data = pd.DataFrame({
-        'Date': dates,
-        'Engagement_Score': [random.uniform(60, 95) for _ in range(len(dates))],
-        'Attendance': [random.uniform(80, 98) for _ in range(len(dates))]
-    })
-    topics = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Literature']
-    topic_data = pd.DataFrame({
-        'Topic': topics,
-        'Engagement_Score': [random.uniform(70, 95) for _ in range(len(topics))],
-        'Dissociation_Rate': [random.uniform(5, 25) for _ in range(len(topics))]
-    })
-    return engagement_data, topic_data
+# --- API Helper with Error Handling ---
+def fetch_api(url, description, params=None):
+    try:
+        resp = requests.get(url, params=params, timeout=5)
+        if resp.status_code == 200:
+            try:
+                return resp.json()
+            except Exception as e:
+                st.error(f"{description}: Invalid JSON response.")
+                if debug:
+                    st.exception(e)
+                return None
+        else:
+            st.error(f"{description}: Backend returned status {resp.status_code}")
+            if debug:
+                st.text(resp.text)
+            return None
+    except requests.exceptions.Timeout:
+        st.error(f"{description}: Request timed out.")
+    except requests.exceptions.ConnectionError:
+        st.error(f"{description}: Could not connect to backend.")
+    except Exception as e:
+        st.error(f"{description}: Unexpected error.")
+        if debug:
+            st.exception(e)
+    return None
 
-engagement_data, topic_data = generate_sample_data()
+# --- Real-time Attendance & Engagement ---
+st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/bar-chart-2.svg" width="26" style="margin-right: 10px;"> Real-time Attendance & Engagement</div>', unsafe_allow_html=True)
 
-# --- KPIs Section ---
-kpi1, kpi2, kpi3 = st.columns(3)
-with kpi1:
-    st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/bar-chart-2.svg" width="26" style="margin-right: 10px;">Attendance Summary</div>', unsafe_allow_html=True)
-    st.metric(label="Overall Attendance", value="92.5%", delta="+2.3%")
-    st.caption("Based on last 30 days")
-with kpi2:
-    st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/activity.svg" width="26" style="margin-right: 10px;">Engagement Summary</div>', unsafe_allow_html=True)
-    st.metric(label="Average Engagement", value="87.2%", delta="-1.8%")
-    st.caption("Real-time tracking")
-with kpi3:
-    st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/clock.svg" width="26" style="margin-right: 10px;">Latest Session</div>', unsafe_allow_html=True)
-    st.metric(label="Session Duration", value="45 min", delta="+5 min")
-    st.caption("Current session")
+realtime_data = fetch_api(
+    url="http://localhost:8000/api/classroom/realtime",
+    description="Real-time Attendance & Engagement",
+    params={"subject": subject_name}
+)
 
-# --- Analytics & Insights ---
-st.markdown('<hr style="border: none; height: 32px; background: transparent;">', unsafe_allow_html=True)
-st.markdown('<div style="width:100%;height:100%;background:rgba(0,0,0,0.04);border-radius:1.2rem;padding:1.5rem 0 0.5rem 0;margin-bottom:1.5rem;">', unsafe_allow_html=True)
-st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/trending-up.svg" width="26" style="margin-right: 10px;">Analytics & Insights</div>', unsafe_allow_html=True)
-chart_col1, chart_col2 = st.columns(2)
-with chart_col1:
-    st.markdown('<div class="metric-title" style="margin-bottom:0.3rem;">Engagement Timeline</div>', unsafe_allow_html=True)
-    fig_engagement = px.line(
-        engagement_data, 
-        x='Date', 
-        y='Engagement_Score',
-        title=None,
-        color_discrete_sequence=['#667eea']
-    )
-    fig_engagement.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#222'),
-        xaxis=dict(gridcolor='#e0e0e0'),
-        yaxis=dict(gridcolor='#e0e0e0')
-    )
-    st.plotly_chart(fig_engagement, use_container_width=True)
-with chart_col2:
-    st.markdown('<div class="metric-title" style="margin-bottom:0.3rem;">Topic Engagement Analytics</div>', unsafe_allow_html=True)
-    fig_topics = px.bar(
-        topic_data,
-        x='Topic',
-        y='Dissociation_Rate',
-        title=None,
-        color='Engagement_Score',
-        color_continuous_scale='RdYlGn_r'
-    )
-    fig_topics.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font=dict(color='#222'),
-        xaxis=dict(gridcolor='#e0e0e0'),
-        yaxis=dict(gridcolor='#e0e0e0')
-    )
-    st.plotly_chart(fig_topics, use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
+if realtime_data:
+    present_ids = realtime_data.get('present_ids', [])
+    engagement = realtime_data.get('engagement', [])
+    attendance_pct = len(present_ids) / total_strength * 100 if total_strength else 0
+    engaged_count = sum(1 for e in engagement if e['engagement'] == 'Engaged')
+    engagement_pct = engaged_count / len(present_ids) * 100 if present_ids else 0
+    kpi1, kpi2 = st.columns(2)
+    with kpi1:
+        st.metric('Attendance', f'{attendance_pct:.1f}%')
+    with kpi2:
+        st.metric('Engagement', f'{engagement_pct:.1f}%')
+    st.markdown('**Live Engagement Table:**')
+    if engagement:
+        st.dataframe(pd.DataFrame(engagement))
+    else:
+        st.info("No engagement data available.")
+else:
+    st.info("Waiting for real-time data from backend...")
 
-# --- Media & Documents ---
-st.markdown('<hr style="border: none; height: 32px; background: transparent;">', unsafe_allow_html=True)
-st.markdown('<div style="width:100%;height:100%;background:rgba(0,0,0,0.04);border-radius:1.2rem;padding:1.5rem 0 0.5rem 0;margin-bottom:1.5rem;">', unsafe_allow_html=True)
-st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/video.svg" width="26" style="margin-right: 10px;">Media & Documents</div>', unsafe_allow_html=True)
+# --- Resources: Transcripts & Remedial Videos ---
+st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/video.svg" width="26" style="margin-right: 10px;"> Media & Documents</div>', unsafe_allow_html=True)
+
+resources = fetch_api(
+    url="http://localhost:8000/api/classroom/resources",
+    description="Transcripts & Remedial Videos",
+    params={"subject": subject_name}
+) or {"transcripts": [], "remedial_videos": []}
+
 media_col1, media_col2 = st.columns(2)
 with media_col1:
-    st.markdown('<div class="metric-title">Latest Video Session</div>', unsafe_allow_html=True)
-    video_url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    st.video(video_url)
-    st.markdown('<div class="metric-title" style="margin-top:0.5rem;">Session Details</div>', unsafe_allow_html=True)
-    st.markdown(f"<ul style='margin:0 0 0 1.2rem; padding:0; color:#444; font-size:1rem;'>"
-                f"<li><b>Date:</b> {datetime.now().strftime('%B %d, %Y')}</li>"
-                f"<li><b>Duration:</b> 45 minutes</li>"
-                f"<li><b>Students Present:</b> 28/30</li>"
-                f"<li><b>Topics Covered:</b> Advanced Calculus, Linear Algebra</li>"
-                f"</ul>", unsafe_allow_html=True)
+    st.markdown('<div class="metric-title">Transcripts</div>', unsafe_allow_html=True)
+    if resources.get('transcripts'):
+        for t in resources.get('transcripts', []):
+            try:
+                file_bytes = requests.get(t['url'], timeout=5).content
+                st.download_button(label=f'⬇️ {t["name"]}', data=file_bytes, file_name=t['name'])
+            except Exception as e:
+                st.warning(f"Could not download {t['name']}")
+                if debug:
+                    st.exception(e)
+    else:
+        st.info("No transcripts available.")
 with media_col2:
-    st.markdown('<div class="metric-title">Generated Transcripts</div>', unsafe_allow_html=True)
-    transcripts = [
-        {"name": "Calculus_Lecture_01.pdf", "date": "2024-01-15", "size": "2.3 MB"},
-        {"name": "Linear_Algebra_Session_02.pdf", "date": "2024-01-12", "size": "1.8 MB"},
-        {"name": "Differential_Equations_Class.pdf", "date": "2024-01-10", "size": "3.1 MB"},
-        {"name": "Vector_Calculus_Review.pdf", "date": "2024-01-08", "size": "2.7 MB"}
-    ]
-    for transcript in transcripts:
-        col_a, col_b, col_c = st.columns([2.5, 1.5, 0.7])
-        with col_a:
-            st.markdown(f'<span style="font-size:1.05rem; color:#fff;">📄 {transcript["name"]}</span>', unsafe_allow_html=True)
-        with col_b:
-            st.markdown(f'<span style="color:#bbb;">{transcript["date"]}</span>', unsafe_allow_html=True)
-        with col_c:
-            st.download_button(
-                label="⬇️",
-                data=b"Sample PDF content",  # Placeholder
-                file_name=transcript['name'],
-                mime="application/pdf",
-                key=f"download_{transcript['name']}"
-            )
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="metric-title">Remedial Videos</div>', unsafe_allow_html=True)
+    if resources.get('remedial_videos'):
+        for v in resources.get('remedial_videos', []):
+            try:
+                file_bytes = requests.get(v['url'], timeout=5).content
+                st.download_button(label=f'⬇️ {v["topic"]} Video', data=file_bytes, file_name=f'{v["topic"]}.mp4')
+            except Exception as e:
+                st.warning(f"Could not download {v['topic']} video")
+                if debug:
+                    st.exception(e)
+    else:
+        st.info("No remedial videos available.")
 
-# --- Configuration & System Health ---
-st.markdown('<hr style="border: none; height: 32px; background: transparent;">', unsafe_allow_html=True)
-st.markdown('<div style="width:100%;height:100%;background:rgba(0,0,0,0.04);border-radius:1.2rem;padding:1.5rem 0 0.5rem 0;margin-bottom:1.5rem;">', unsafe_allow_html=True)
-st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/settings.svg" width="26" style="margin-right: 10px;">Configuration & System</div>', unsafe_allow_html=True)
-config_col, sys_col = st.columns(2)
-with config_col:
-    st.markdown('<div class="metric-title">Configuration Panel</div>', unsafe_allow_html=True)
-    video_quality = st.selectbox(
-        "Video Quality",
-        ["720p", "1080p", "4K"],
-        index=1,
-        help="Select the preferred video quality for recordings"
-    )
-    animation_style = st.selectbox(
-        "Animation Style",
-        ["Smooth", "Fast", "Minimal"],
-        index=0,
-        help="Choose the animation style for UI transitions"
-    )
-    sensitivity_threshold = st.slider(
-        "Engagement Sensitivity Threshold",
-        min_value=0.1,
-        max_value=1.0,
-        value=0.7,
-        step=0.1,
-        help="Adjust the sensitivity for engagement detection"
-    )
-    auto_save_freq = st.selectbox(
-        "Auto-save Frequency",
-        ["Every 5 minutes", "Every 10 minutes", "Every 15 minutes", "Manual only"],
-        index=1
-    )
-    if st.button("Save Configuration", type="primary"):
-        st.success("Configuration saved successfully!")
-with sys_col:
-    st.markdown('<div class="metric-title">System Health</div>', unsafe_allow_html=True)
-    api_status = random.choice([True, False])
-    if api_status:
-        st.success("API Connection: Active")
+# --- Disengagement Analytics ---
+st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/activity.svg" width="26" style="margin-right: 10px;"> Disengagement Analytics</div>', unsafe_allow_html=True)
+
+analytics = fetch_api(
+    url="http://localhost:8000/api/classroom/disengagement",
+    description="Disengagement Analytics",
+    params={"subject": subject_name}
+)
+
+if analytics:
+    st.markdown('**Most Disengaged Students:**')
+    student_df = pd.DataFrame(analytics.get('most_disengaged_students', []))
+    if not student_df.empty:
+        st.bar_chart(student_df.set_index('id')['disengagement_count'])
     else:
-        st.error("API Connection: Failed")
-    disk_usage = random.uniform(60, 85)
-    if disk_usage < 70:
-        st.success(f"Disk Usage: {disk_usage:.1f}%")
-    elif disk_usage < 85:
-        st.warning(f"Disk Usage: {disk_usage:.1f}%")
+        st.info("No disengaged students data available.")
+    st.markdown('**Most Disengaged Topics:**')
+    topic_df = pd.DataFrame(analytics.get('most_disengaged_topics', []))
+    if not topic_df.empty:
+        st.bar_chart(topic_df.set_index('topic')['disengagement_count'])
     else:
-        st.error(f"Disk Usage: {disk_usage:.1f}%")
-    memory_usage = random.uniform(40, 75)
-    st.info(f"Memory Usage: {memory_usage:.1f}%")
-    st.markdown('<div class="metric-title" style="margin-top:0.7rem;">Recent System Messages</div>', unsafe_allow_html=True)
-    system_messages = [
-        "Session recording completed successfully",
-        "High CPU usage detected during video processing",
-        "Transcript generation completed",
-        "Backup scheduled for tonight at 2:00 AM"
-    ]
-    for message in system_messages:
-        st.markdown(f"<li style='color:#444; font-size:1rem; margin-left:1.2rem;'>{message}</li>", unsafe_allow_html=True)
-    if st.button("🔄 Refresh System Status"):
-        st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
+        st.info("No disengaged topics data available.")
+    st.markdown('**Disengagement Timeline:**')
+    timeline_df = pd.DataFrame(analytics.get('timeline', []))
+    if not timeline_df.empty:
+        st.dataframe(timeline_df)
+    else:
+        st.info("No disengagement timeline data available.")
+else:
+    st.info("Waiting for disengagement analytics from backend...")
 
 # --- Footer ---
 st.markdown("---")
