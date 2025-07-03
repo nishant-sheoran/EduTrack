@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 import random
 import plotly.express as px
+import plotly.graph_objects as go
 
 # --- Page Config ---
 st.set_page_config(
@@ -88,22 +89,51 @@ realtime_data = fetch_api(
     params={"subject": subject_name}
 )
 
+engagement_df = None
+
 if realtime_data:
     present_ids = realtime_data.get('present_ids', [])
     engagement = realtime_data.get('engagement', [])
+    emotions = realtime_data.get('emotions', [])
     attendance_pct = len(present_ids) / total_strength * 100 if total_strength else 0
     engaged_count = sum(1 for e in engagement if e['engagement'] == 'Engaged')
     engagement_pct = engaged_count / len(present_ids) * 100 if present_ids else 0
+    engagement_df = pd.DataFrame(engagement)
+
     kpi1, kpi2 = st.columns(2)
     with kpi1:
         st.metric('Attendance', f'{attendance_pct:.1f}%')
     with kpi2:
         st.metric('Engagement', f'{engagement_pct:.1f}%')
-    st.markdown('**Live Engagement Table:**')
-    if engagement:
-        st.dataframe(pd.DataFrame(engagement))
-    else:
-        st.info("No engagement data available.")
+
+    # --- Engagement Gauge ---
+    st.markdown("### 🧭 Engagement Level Gauge")
+    gauge_fig = go.Figure(go.Indicator(
+        mode = "gauge+number",
+        value = engagement_pct,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': "Engagement %"},
+        gauge = {
+            'axis': {'range': [0, 100]},
+            'bar': {'color': "#00e676"},
+            'steps': [
+                {'range': [0, 50], 'color': '#ff1744'},
+                {'range': [50, 100], 'color': '#00bfae'}
+            ]
+        }
+    ))
+    st.plotly_chart(gauge_fig, use_container_width=True)
+
+    # --- Emotion Bar Chart ---
+    if emotions:
+        st.markdown("### 😊 Emotion Distribution")
+        emotion_df = pd.DataFrame(emotions)
+        fig_emotions = px.bar(emotion_df, x='emotion', y='count', color='emotion', title='Student Emotions')
+        st.plotly_chart(fig_emotions, use_container_width=True)
+
+    # --- Live Table ---
+    st.markdown("### 🧾 Live Engagement Table")
+    st.dataframe(engagement_df)
 else:
     st.info("Waiting for real-time data from backend...")
 
@@ -137,37 +167,6 @@ with media_col2:
             st.warning(f"Could not download {v['topic']} video")
             if debug:
                 st.exception(e)
-
-# --- Disengagement Analytics ---
-st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/activity.svg" width="26" style="margin-right: 10px;"> Disengagement Analytics</div>', unsafe_allow_html=True)
-
-analytics = fetch_api(
-    url="http://localhost:8000/api/classroom/disengagement",
-    description="Disengagement Analytics",
-    params={"subject": subject_name}
-)
-
-if analytics:
-    st.markdown('**Most Disengaged Students:**')
-    student_df = pd.DataFrame(analytics.get('most_disengaged_students', []))
-    if not student_df.empty:
-        st.plotly_chart(px.bar(student_df, x='id', y='disengagement_count', title='Student Disengagement'))
-    else:
-        st.info("No disengaged students data available.")
-    st.markdown('**Most Disengaged Topics:**')
-    topic_df = pd.DataFrame(analytics.get('most_disengaged_topics', []))
-    if not topic_df.empty:
-        st.plotly_chart(px.bar(topic_df, x='topic', y='disengagement_count', title='Topic Disengagement'))
-    else:
-        st.info("No disengaged topics data available.")
-    st.markdown('**Disengagement Timeline:**')
-    timeline_df = pd.DataFrame(analytics.get('timeline', []))
-    if not timeline_df.empty:
-        st.line_chart(timeline_df.set_index('date'))
-    else:
-        st.info("No disengagement timeline data available.")
-else:
-    st.info("Waiting for disengagement analytics from backend...")
 
 # --- System Health Simulation ---
 st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/settings.svg" width="26" style="margin-right: 10px;"> System Health</div>', unsafe_allow_html=True)
