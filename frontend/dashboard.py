@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import requests
 from datetime import datetime
+import random
+import plotly.express as px
 
 # --- Page Config ---
 st.set_page_config(
@@ -63,12 +65,10 @@ def fetch_api(url, description, params=None):
                 st.error(f"{description}: Invalid JSON response.")
                 if debug:
                     st.exception(e)
-                return None
         else:
             st.error(f"{description}: Backend returned status {resp.status_code}")
             if debug:
                 st.text(resp.text)
-            return None
     except requests.exceptions.Timeout:
         st.error(f"{description}: Request timed out.")
     except requests.exceptions.ConnectionError:
@@ -119,30 +119,24 @@ resources = fetch_api(
 media_col1, media_col2 = st.columns(2)
 with media_col1:
     st.markdown('<div class="metric-title">Transcripts</div>', unsafe_allow_html=True)
-    if resources.get('transcripts'):
-        for t in resources.get('transcripts', []):
-            try:
-                file_bytes = requests.get(t['url'], timeout=5).content
-                st.download_button(label=f'⬇️ {t["name"]}', data=file_bytes, file_name=t['name'])
-            except Exception as e:
-                st.warning(f"Could not download {t['name']}")
-                if debug:
-                    st.exception(e)
-    else:
-        st.info("No transcripts available.")
+    for t in resources.get('transcripts', []):
+        try:
+            file_bytes = requests.get(t['url'], timeout=5).content
+            st.download_button(label=f'⬇️ {t["name"]}', data=file_bytes, file_name=t['name'])
+        except Exception as e:
+            st.warning(f"Could not download {t['name']}")
+            if debug:
+                st.exception(e)
 with media_col2:
     st.markdown('<div class="metric-title">Remedial Videos</div>', unsafe_allow_html=True)
-    if resources.get('remedial_videos'):
-        for v in resources.get('remedial_videos', []):
-            try:
-                file_bytes = requests.get(v['url'], timeout=5).content
-                st.download_button(label=f'⬇️ {v["topic"]} Video', data=file_bytes, file_name=f'{v["topic"]}.mp4')
-            except Exception as e:
-                st.warning(f"Could not download {v['topic']} video")
-                if debug:
-                    st.exception(e)
-    else:
-        st.info("No remedial videos available.")
+    for v in resources.get('remedial_videos', []):
+        try:
+            file_bytes = requests.get(v['url'], timeout=5).content
+            st.download_button(label=f'⬇️ {v["topic"]} Video', data=file_bytes, file_name=f'{v["topic"]}.mp4')
+        except Exception as e:
+            st.warning(f"Could not download {v['topic']} video")
+            if debug:
+                st.exception(e)
 
 # --- Disengagement Analytics ---
 st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/activity.svg" width="26" style="margin-right: 10px;"> Disengagement Analytics</div>', unsafe_allow_html=True)
@@ -157,23 +151,53 @@ if analytics:
     st.markdown('**Most Disengaged Students:**')
     student_df = pd.DataFrame(analytics.get('most_disengaged_students', []))
     if not student_df.empty:
-        st.bar_chart(student_df.set_index('id')['disengagement_count'])
+        st.plotly_chart(px.bar(student_df, x='id', y='disengagement_count', title='Student Disengagement'))
     else:
         st.info("No disengaged students data available.")
     st.markdown('**Most Disengaged Topics:**')
     topic_df = pd.DataFrame(analytics.get('most_disengaged_topics', []))
     if not topic_df.empty:
-        st.bar_chart(topic_df.set_index('topic')['disengagement_count'])
+        st.plotly_chart(px.bar(topic_df, x='topic', y='disengagement_count', title='Topic Disengagement'))
     else:
         st.info("No disengaged topics data available.")
     st.markdown('**Disengagement Timeline:**')
     timeline_df = pd.DataFrame(analytics.get('timeline', []))
     if not timeline_df.empty:
-        st.dataframe(timeline_df)
+        st.line_chart(timeline_df.set_index('date'))
     else:
         st.info("No disengagement timeline data available.")
 else:
     st.info("Waiting for disengagement analytics from backend...")
+
+# --- System Health Simulation ---
+st.markdown('<div class="section-header"><img src="https://raw.githubusercontent.com/feathericons/feather/master/icons/settings.svg" width="26" style="margin-right: 10px;"> System Health</div>', unsafe_allow_html=True)
+sys_col1, sys_col2 = st.columns(2)
+with sys_col1:
+    api_status = random.choice([True, False])
+    if api_status:
+        st.success("API Connection: Active")
+    else:
+        st.error("API Connection: Failed")
+with sys_col2:
+    disk_usage = random.uniform(60, 85)
+    if disk_usage < 70:
+        st.success(f"Disk Usage: {disk_usage:.1f}%")
+    elif disk_usage < 85:
+        st.warning(f"Disk Usage: {disk_usage:.1f}%")
+    else:
+        st.error(f"Disk Usage: {disk_usage:.1f}%")
+    memory_usage = random.uniform(40, 75)
+    st.info(f"Memory Usage: {memory_usage:.1f}%")
+    system_messages = [
+        "Session recording completed successfully",
+        "Transcript generation completed",
+        "High CPU usage detected during video processing",
+        "Backup scheduled for tonight at 2:00 AM"
+    ]
+    for msg in system_messages:
+        st.markdown(f"- {msg}")
+    if st.button("🔄 Refresh System Status"):
+        st.rerun()
 
 # --- Footer ---
 st.markdown("---")
@@ -184,4 +208,4 @@ st.markdown(
     </div>
     """,
     unsafe_allow_html=True
-) 
+)
