@@ -1,8 +1,28 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 220 13% 91%;
+  --primary: 220 14% 96%;
+  --primary-foreground: 220 9% 46%;
+  --secondary: 220 14% 96%;
+  --secondary-foreground: 220 9% 46%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 20% 98%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 9% 46%;
+  --accent: 220 14% 96%;
+  --accent-foreground: 220 9% 46%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 9% 46%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 9% 46%;
+  --radius: 0.5rem;
 }
 
 @theme inline {
@@ -10,12 +30,47 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);
+    }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+    }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --border: 220 13% 18%;
+    --input: 220 13% 18%;
+    --ring: 220 13% 18%;
+    --primary: 220 14% 96%;
+    --primary-foreground: 220 9% 46%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 46%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 98%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 9% 46%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 9% 46%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 9% 46%;
   }
 }
 
@@ -27,52 +82,52 @@ body {
 
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; 
 
 @layer components {
   /* Custom button interactions */
   .btn-interactive {
     @apply transition-all duration-200 ease-in-out;
   }
-  
+
   .btn-interactive:hover {
     @apply transform scale-105;
   }
-  
+
   .btn-interactive:active {
     @apply transform scale-95;
   }
-  
+
   /* Custom slider styling */
   .slider {
     @apply appearance-none bg-gray-700 rounded-lg;
   }
-  
+
   .slider::-webkit-slider-thumb {
     @apply appearance-none w-4 h-4 bg-blue-400 rounded-full cursor-pointer;
   }
-  
+
   .slider::-moz-range-thumb {
     @apply w-4 h-4 bg-blue-400 rounded-full cursor-pointer border-0;
   }
-  
+
   /* Custom scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
     @apply w-2;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-track {
     @apply bg-gray-700 rounded-full;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply bg-gray-500 rounded-full;
   }
-  
+
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-gray-400;
   }
-  
+
   /* Loading animation */
   @keyframes pulse {
     0%, 100% {
@@ -82,8 +137,17 @@ body {
       opacity: 0.5;
     }
   }
-  
+
   .animate-pulse-slow {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 } 
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

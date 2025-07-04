@@ -40,41 +40,41 @@ export default function SystemHealthPanel() {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-lg font-semibold text-white">System Health</span>
+    <div className="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col h-full hover:shadow-xl transition-all duration-300">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-semibold text-white">System Health</span>
         <button 
           onClick={handleRefresh}
-          className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 btn-interactive"
+          className="p-1 rounded bg-gray-700 hover:bg-gray-600 btn-interactive"
           disabled={loading}
         >
-          <RefreshCw className={`w-4 h-4 text-white ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3 h-3 text-white ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      <div className="space-y-4 flex-1">
+      <div className="space-y-3 flex-1 text-xs">
         {/* API Status */}
-        <div className="flex items-center gap-3">
-          <Wifi className="w-5 h-5 text-blue-400" />
-          <span className="text-white">API Connection:</span>
+        <div className="flex items-center gap-2">
+          <Wifi className="w-3 h-3 text-blue-400" />
+          <span className="text-white">API:</span>
           {getStatusIcon(apiStatus)}
-          <span className={`text-sm ${apiStatus ? 'text-emerald-400' : 'text-red-400'}`}>
+          <span className={`${apiStatus ? 'text-emerald-400' : 'text-red-400'}`}>
             {apiStatus ? 'Active' : 'Failed'}
           </span>
         </div>
 
         {/* Disk Usage */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <HardDrive className="w-5 h-5 text-purple-400" />
-            <span className="text-white">Disk Usage:</span>
-            <span className={`text-sm ${getStatusColor(diskUsage)}`}>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <HardDrive className="w-3 h-3 text-purple-400" />
+            <span className="text-white">Disk:</span>
+            <span className={getStatusColor(diskUsage)}>
               {diskUsage.toFixed(1)}%
             </span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-700 rounded-full h-1.5">
             <div 
-              className={`h-2 rounded-full transition-all ${
+              className={`h-1.5 rounded-full transition-all ${
                 diskUsage < 70 ? 'bg-emerald-400' : diskUsage < 85 ? 'bg-yellow-400' : 'bg-red-400'
               }`}
               style={{ width: `${diskUsage}%` }}
@@ -83,17 +83,17 @@ export default function SystemHealthPanel() {
         </div>
 
         {/* Memory Usage */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <MemoryStick className="w-5 h-5 text-cyan-400" />
-            <span className="text-white">Memory Usage:</span>
-            <span className={`text-sm ${getStatusColor(memoryUsage)}`}>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <MemoryStick className="w-3 h-3 text-cyan-400" />
+            <span className="text-white">Memory:</span>
+            <span className={getStatusColor(memoryUsage)}>
               {memoryUsage.toFixed(1)}%
             </span>
           </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
+          <div className="w-full bg-gray-700 rounded-full h-1.5">
             <div 
-              className={`h-2 rounded-full transition-all ${
+              className={`h-1.5 rounded-full transition-all ${
                 memoryUsage < 70 ? 'bg-emerald-400' : memoryUsage < 85 ? 'bg-yellow-400' : 'bg-red-400'
               }`}
               style={{ width: `${memoryUsage}%` }}
@@ -102,13 +102,13 @@ export default function SystemHealthPanel() {
         </div>
 
         {/* System Messages */}
-        <div className="space-y-2">
-          <span className="text-sm font-medium text-gray-300">Recent Messages:</span>
-          <div className="space-y-1 max-h-24 overflow-y-auto custom-scrollbar">
-            {systemMessages.map((message, index) => (
-              <div key={index} className="flex items-start gap-2 text-xs text-gray-400">
+        <div className="space-y-1">
+          <span className="text-xs font-medium text-gray-300">Messages:</span>
+          <div className="space-y-1 max-h-16 overflow-y-auto custom-scrollbar">
+            {systemMessages.slice(0, 3).map((message, index) => (
+              <div key={index} className="flex items-start gap-1 text-xs text-gray-400">
                 <AlertTriangle className="w-3 h-3 text-yellow-400 mt-0.5 flex-shrink-0" />
-                <span>{message}</span>
+                <span className="leading-tight">{message.substring(0, 50)}...</span>
               </div>
             ))}
           </div>

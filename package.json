@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "react": "^19.1.0"
+    "react": "^19.1.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/react": "^19.1.8"

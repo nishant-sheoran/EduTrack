@@ -4,17 +4,24 @@ import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export interface TeacherConfig {
-  totalStrength: number;
-  subject: string;
+  // Core class inputs for real-time calculations
+  totalStudents: number;
+  currentSubject: string;
+  
+  // Existing config options
   videoQuality: string;
   animationStyle: string;
   autoSaveFrequency: number;
   engagementSensitivity: number;
+  
+  // Legacy field for backward compatibility
+  totalStrength?: number;
+  subject?: string;
 }
 
 const defaultConfig: TeacherConfig = {
-  totalStrength: 30,
-  subject: "Mathematics",
+  totalStudents: 30,
+  currentSubject: "Mathematics",
   videoQuality: "HD",
   animationStyle: "Smooth",
   autoSaveFrequency: 5,

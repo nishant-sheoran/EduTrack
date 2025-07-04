@@ -7,11 +7,18 @@ A modern, responsive teacher dashboard built with Next.js, TypeScript, and Tailw
 ### 🎯 Core Components
 
 - **KPIBox**: Displays key performance indicators with delta values and icons
-- **ChartBox**: Interactive charts using Recharts (line and bar charts)
-- **VideoBox**: Session video player with session details
-- **TranscriptList**: Downloadable transcript management
-- **ConfigPanel**: Configuration settings with localStorage persistence
+- **ChartBox**: Interactive charts using Recharts (line and bar charts)  
+- **VideoBox**: Session video player with session details and subject categorization
+- **TranscriptList**: Downloadable transcript management with subject filtering
+- **ConfigPanel**: Configuration settings with real-time class inputs and localStorage persistence
 - **SystemHealthPanel**: Real-time system status monitoring
+
+### 🚀 Real-Time Features
+
+- **Live Attendance Calculation**: Uses teacher input (total students) and engagement model detection (students in frame) to calculate real-time attendance percentage
+- **Live Engagement Tracking**: Analyzes detected faces for engagement scores and calculates average engagement percentage
+- **Subject Categorization**: Teacher can set current subject which automatically categorizes new transcripts and video sessions
+- **Auto-Refresh**: KPIs update every 5 seconds, system health every 10 seconds for real-time monitoring
 
 ### 🎨 Design System
 
@@ -55,7 +62,8 @@ src/
 ├── hooks/
 │   ├── useDashboardData.ts   # Dashboard data management
 │   ├── useSystemHealth.ts    # System health monitoring
-│   └── useLocalStorage.ts    # localStorage persistence
+│   ├── useLocalStorage.ts    # localStorage persistence
+│   └── useRealTimeKPIs.ts    # Real-time engagement and attendance calculation
 ├── lib/
 │   └── mockData.ts           # Mock API data and interfaces
 └── styles/
@@ -78,9 +86,9 @@ src/
    ```
 
 3. Run the development server:
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
@@ -91,12 +99,36 @@ src/
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
+## Teacher Input Configuration
+
+### Real-Time Class Settings
+
+The dashboard includes two critical teacher inputs that enable real-time calculations:
+
+1. **Total Students in Class**: Used for attendance percentage calculation
+   - Input: Number field (1-200 students)
+   - Updates KPIs automatically when changed
+   - Formula: `Attendance % = (Students Detected in Frame / Total Students) × 100`
+
+2. **Current Subject**: Used for content categorization
+   - Input: Dropdown with predefined subjects or "Other" option
+   - Automatically categorizes new transcripts and video sessions
+   - Enables subject-based filtering in transcript list
+
+### How It Works
+
+1. Teacher sets total class size and current subject in Configuration panel
+2. Engagement model detects students in camera frame every 5 seconds
+3. System calculates live attendance: `detected students / total students`
+4. System calculates live engagement: `average engagement score from detected faces`
+5. All new content (transcripts, videos) gets tagged with current subject
+
 ## Component Usage
 
 ### KPIBox
 ```tsx
 <KPIBox 
-  title="Attendance"
+  title="Live Attendance"
   value="92.5%"
   delta={2.1}
   icon={<Users />}
@@ -166,6 +198,7 @@ Custom grid areas are defined in `bento-grid.css`:
 - **useDashboardData**: Fetches and manages dashboard data with real-time updates
 - **useSystemHealth**: Monitors system health with auto-refresh
 - **useLocalStorage**: Type-safe localStorage wrapper
+- **useRealTimeKPIs**: Calculates live attendance and engagement based on teacher inputs and engagement model
 
 ## Data Flow
 

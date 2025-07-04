@@ -10,6 +10,7 @@ interface Transcript {
   date: string;
   size: string;
   url: string;
+  subject: string;
 }
 
 interface TranscriptListProps {
@@ -23,28 +24,32 @@ export default function TranscriptList({
       name: "Mathematics_Lesson_01.pdf",
       date: "2024-01-15",
       size: "2.3 MB",
-      url: "#"
+      url: "#",
+      subject: "Mathematics"
     },
     {
       id: "2", 
       name: "Physics_Experiment_Notes.pdf",
       date: "2024-01-14",
       size: "1.8 MB",
-      url: "#"
+      url: "#",
+      subject: "Physics"
     },
     {
       id: "3",
       name: "Chemistry_Lab_Report.pdf", 
       date: "2024-01-13",
       size: "3.1 MB",
-      url: "#"
+      url: "#",
+      subject: "Chemistry"
     },
     {
       id: "4",
       name: "Biology_Discussion.pdf",
       date: "2024-01-12", 
       size: "2.7 MB",
-      url: "#"
+      url: "#",
+      subject: "Biology"
     }
   ]
 }: TranscriptListProps) {
@@ -62,16 +67,18 @@ export default function TranscriptList({
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col h-full">
-      <div className="flex items-center gap-2 mb-4">
-        <FileText className="w-5 h-5 text-blue-400" />
-        <span className="text-lg font-semibold text-white">Transcripts</span>
+    <div className="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col h-full hover:shadow-xl transition-all duration-300">
+      <div className="flex items-center gap-2 mb-3">
+          <FileText className="w-4 h-4 text-blue-400" />
+          <span className="text-sm font-semibold text-white">Transcripts</span>
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
         {transcripts.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <span className="text-gray-400">No transcripts available</span>
+            <span className="text-gray-400 text-xs text-center">
+              No transcripts available
+            </span>
           </div>
         ) : (
           transcripts.map((transcript) => (
@@ -79,12 +86,17 @@ export default function TranscriptList({
               key={transcript.id} 
               className="bg-gray-700 rounded-lg p-3 hover:bg-gray-600 transition-colors"
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-medium text-white truncate">
-                    {transcript.name}
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-xs font-medium text-white truncate">
+                      {transcript.name.replace('.pdf', '').replace('_', ' ')}
                   </h4>
-                  <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
+                    <span className="px-2 py-0.5 bg-blue-600 text-xs text-white rounded flex-shrink-0">
+                      {transcript.subject}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       <span>{transcript.date}</span>
@@ -100,7 +112,7 @@ export default function TranscriptList({
                   className="p-2 rounded-lg bg-blue-600 hover:bg-blue-500 btn-interactive flex-shrink-0"
                   title={`Download ${transcript.name}`}
                 >
-                  <Download className="w-4 h-4 text-white" />
+                  <Download className="w-3 h-3 text-white" />
                 </button>
               </div>
             </div>

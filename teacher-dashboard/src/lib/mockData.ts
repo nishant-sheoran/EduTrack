@@ -17,6 +17,7 @@ export interface DashboardData {
     date: string;
     size: string;
     url: string;
+    subject: string;
   }>;
   systemHealth: {
     apiStatus: boolean;
@@ -31,6 +32,17 @@ export interface DashboardData {
     totalStudents: number;
     topics: string[];
     videoUrl: string;
+    subject: string;
+  };
+  realTimeEngagement: {
+    studentsInFrame: number;
+    lastUpdated: string;
+    detectedFaces: Array<{
+      id: string;
+      engagementScore: number;
+      emotion: string;
+      timestamp: string;
+    }>;
   };
 }
 
@@ -80,6 +92,7 @@ export const mockDashboardData: DashboardData = {
       date: "2024-01-15",
       size: "2.3 MB",
       url: "#",
+      subject: "Mathematics",
     },
     {
       id: "2",
@@ -87,6 +100,7 @@ export const mockDashboardData: DashboardData = {
       date: "2024-01-14",
       size: "1.8 MB",
       url: "#",
+      subject: "Physics",
     },
     {
       id: "3",
@@ -94,6 +108,7 @@ export const mockDashboardData: DashboardData = {
       date: "2024-01-13",
       size: "3.1 MB",
       url: "#",
+      subject: "Chemistry",
     },
     {
       id: "4",
@@ -101,6 +116,7 @@ export const mockDashboardData: DashboardData = {
       date: "2024-01-12",
       size: "2.7 MB",
       url: "#",
+      subject: "Biology",
     },
     {
       id: "5",
@@ -108,6 +124,7 @@ export const mockDashboardData: DashboardData = {
       date: "2024-01-11",
       size: "1.5 MB",
       url: "#",
+      subject: "English",
     },
   ],
   systemHealth: {
@@ -129,6 +146,18 @@ export const mockDashboardData: DashboardData = {
     totalStudents: 30,
     topics: ["Algebra", "Quadratic Equations", "Problem Solving"],
     videoUrl: "#",
+    subject: "Mathematics",
+  },
+  realTimeEngagement: {
+    studentsInFrame: 25,
+    lastUpdated: new Date().toISOString(),
+    detectedFaces: [
+      { id: "face_1", engagementScore: 85, emotion: "focused", timestamp: new Date().toISOString() },
+      { id: "face_2", engagementScore: 72, emotion: "neutral", timestamp: new Date().toISOString() },
+      { id: "face_3", engagementScore: 90, emotion: "interested", timestamp: new Date().toISOString() },
+      { id: "face_4", engagementScore: 65, emotion: "confused", timestamp: new Date().toISOString() },
+      { id: "face_5", engagementScore: 88, emotion: "focused", timestamp: new Date().toISOString() },
+    ],
   },
 };
 
@@ -147,4 +176,54 @@ export const fetchSystemHealth = (): Promise<DashboardData['systemHealth']> => {
       resolve(mockDashboardData.systemHealth);
     }, 300);
   });
+};
+
+// Engagement model simulation
+export const fetchRealTimeEngagement = (): Promise<DashboardData['realTimeEngagement']> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Simulate varying number of students in frame (20-30)
+      const studentsInFrame = Math.floor(Math.random() * 11) + 20;
+      
+      // Generate random engagement data for detected faces
+      const detectedFaces = Array.from({ length: Math.min(studentsInFrame, 10) }, (_, i) => ({
+        id: `face_${i + 1}`,
+        engagementScore: Math.floor(Math.random() * 40) + 60, // 60-100
+        emotion: ['focused', 'neutral', 'interested', 'confused', 'bored'][Math.floor(Math.random() * 5)],
+        timestamp: new Date().toISOString(),
+      }));
+
+      resolve({
+        studentsInFrame,
+        lastUpdated: new Date().toISOString(),
+        detectedFaces,
+      });
+    }, 200);
+  });
+};
+
+// Calculate real-time KPIs based on class size and detected students
+export const calculateRealTimeKPIs = (
+  totalStudents: number,
+  studentsInFrame: number,
+  detectedFaces: DashboardData['realTimeEngagement']['detectedFaces']
+) => {
+  // Calculate attendance percentage
+  const attendancePercentage = Math.min((studentsInFrame / totalStudents) * 100, 100);
+  
+  // Calculate average engagement from detected faces
+  const avgEngagement = detectedFaces.length > 0 
+    ? detectedFaces.reduce((sum, face) => sum + face.engagementScore, 0) / detectedFaces.length
+    : 0;
+
+  return {
+    attendance: {
+      value: `${attendancePercentage.toFixed(1)}%`,
+      delta: Math.random() * 10 - 5, // Random delta for demo
+    },
+    engagement: {
+      value: `${avgEngagement.toFixed(1)}%`,
+      delta: Math.random() * 10 - 5, // Random delta for demo
+    },
+  };
 }; 

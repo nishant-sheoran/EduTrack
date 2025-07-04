@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         <ConfigProvider>
           <ToastProvider>
-            {children}
+        {children}
           </ToastProvider>
         </ConfigProvider>
       </body>

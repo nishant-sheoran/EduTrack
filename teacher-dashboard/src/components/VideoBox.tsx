@@ -9,7 +9,7 @@ interface VideoBoxProps {
   studentsPresent?: number;
   totalStudents?: number;
   topics?: string[];
-  videoUrl?: string;
+  subject?: string;
 }
 
 export default function VideoBox({
@@ -18,22 +18,25 @@ export default function VideoBox({
   studentsPresent = 28,
   totalStudents = 30,
   topics = ["Algebra", "Quadratic Equations", "Problem Solving"],
-  videoUrl = "#"
+  subject = "Mathematics"
 }: VideoBoxProps) {
   return (
-    <div className="bg-gray-800 rounded-xl p-6 shadow-lg flex flex-col h-full">
-      <div className="flex items-center gap-2 mb-4">
-        <Play className="w-5 h-5 text-red-400" />
-        <span className="text-lg font-semibold text-white">Latest Session</span>
+    <div className="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col h-full hover:shadow-xl transition-all duration-300">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Play className="w-4 h-4 text-red-400" />
+          <span className="text-sm font-semibold text-white">Latest Session</span>
+        </div>
+        <span className="px-2 py-1 bg-blue-600 text-xs text-white rounded-full">{subject}</span>
       </div>
 
-      <div className="flex-1 space-y-4">
+      <div className="flex-1 space-y-3">
         {/* Video Placeholder */}
         <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <Play className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-400 text-sm">Session Video</p>
+              <Play className="w-8 h-8 text-gray-400 mx-auto mb-1" />
+              <p className="text-gray-400 text-xs">Session Video</p>
             </div>
           </div>
           <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 px-2 py-1 rounded text-xs text-white">
@@ -42,52 +45,57 @@ export default function VideoBox({
         </div>
 
         {/* Session Details */}
-        <div className="space-y-3">
+        <div className="space-y-2 text-xs">
           {/* Date and Duration */}
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-2 text-gray-300">
-              <Calendar className="w-4 h-4" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 text-gray-300">
+              <Calendar className="w-3 h-3" />
               <span>{sessionDate}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <Clock className="w-4 h-4" />
+            <div className="flex items-center gap-1 text-gray-300">
+              <Clock className="w-3 h-3" />
               <span>{duration}</span>
             </div>
           </div>
 
           {/* Students Present */}
-          <div className="flex items-center gap-2 text-sm">
-            <Users className="w-4 h-4 text-blue-400" />
-            <span className="text-white">
-              {studentsPresent}/{totalStudents} students present
+          <div className="flex items-center gap-2">
+            <Users className="w-3 h-3 text-blue-400" />
+            <span className="text-white text-xs">
+              {studentsPresent}/{totalStudents} students
             </span>
-            <span className="text-gray-400">
+            <span className="text-gray-400 text-xs">
               ({Math.round((studentsPresent / totalStudents) * 100)}%)
             </span>
           </div>
 
           {/* Topics Covered */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <BookOpen className="w-4 h-4 text-green-400" />
-              <span className="text-white font-medium">Topics Covered:</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1">
+              <BookOpen className="w-3 h-3 text-green-400" />
+              <span className="text-white font-medium text-xs">Topics:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {topics.map((topic, index) => (
+            <div className="flex flex-wrap gap-1">
+              {topics.slice(0, 2).map((topic, index) => (
                 <span
                   key={index}
-                  className="px-2 py-1 bg-gray-700 text-xs text-gray-300 rounded-full"
+                  className="px-2 py-0.5 bg-gray-700 text-xs text-gray-300 rounded"
                 >
                   {topic}
                 </span>
               ))}
+              {topics.length > 2 && (
+                <span className="px-2 py-0.5 bg-gray-700 text-xs text-gray-300 rounded">
+                  +{topics.length - 2}
+                </span>
+              )}
             </div>
           </div>
 
           {/* View Session Button */}
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white font-medium btn-interactive">
-            <Eye className="w-4 h-4" />
-            View Full Session
+          <button className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white text-xs btn-interactive mt-2">
+            <Eye className="w-3 h-3" />
+            View Session
           </button>
         </div>
       </div>
