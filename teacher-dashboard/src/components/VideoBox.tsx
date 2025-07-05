@@ -21,20 +21,32 @@ export default function VideoBox({
   totalStudents = 30,
   topics = ["Algebra", "Quadratic Equations", "Problem Solving"],
   subject = "Mathematics",
-  videoUrl = "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4"
+  videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 }: VideoBoxProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const handlePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
+  const handlePlayPause = async () => {
+    if (videoRef.current && !hasError) {
+      try {
+        setIsLoading(true);
+        if (isPlaying) {
+          videoRef.current.pause();
+          setIsPlaying(false);
+        } else {
+          await videoRef.current.play();
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        console.warn('Error playing video:', error);
+        setHasError(true);
+        setIsPlaying(false);
+      } finally {
+        setIsLoading(false);
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
@@ -47,10 +59,16 @@ export default function VideoBox({
     }
   };
 
-  const handleExitFullscreen = () => {
+  const handleExitFullscreen = async () => {
     setIsFullscreen(false);
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch (error) {
+      console.warn('Error exiting fullscreen:', error);
+      // Fallback: just update the state
+      setIsFullscreen(false);
     }
   };
 
@@ -74,6 +92,16 @@ export default function VideoBox({
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
             onEnded={() => setIsPlaying(false)}
+            onError={(e) => {
+              console.warn('Video error:', e);
+              setHasError(true);
+              setIsPlaying(false);
+              setIsLoading(false);
+            }}
+            onLoadStart={() => setIsLoading(true)}
+            onLoadedData={() => setIsLoading(false)}
+            onWaiting={() => setIsLoading(true)}
+            onCanPlay={() => setIsLoading(false)}
           >
             <source src={videoUrl} type="video/mp4" />
             Your browser does not support the video tag.
@@ -83,11 +111,26 @@ export default function VideoBox({
           {!isPlaying && (
             <div 
               className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 hover:bg-opacity-60 transition-all"
-              onClick={handlePlayPause}
+              onClick={!hasError ? handlePlayPause : undefined}
             >
               <div className="text-center">
-                <Play className="w-12 h-12 text-white mx-auto mb-2 hover:scale-110 transition-transform" />
-                <p className="text-white text-sm">Play Session</p>
+                {hasError ? (
+                  <>
+                    <X className="w-12 h-12 text-red-400 mx-auto mb-2" />
+                    <p className="text-red-400 text-sm">Video unavailable</p>
+                    <p className="text-gray-400 text-xs mt-1">Demo content</p>
+                  </>
+                ) : isLoading ? (
+                  <>
+                    <div className="w-12 h-12 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                    <p className="text-white text-sm">Loading...</p>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-12 h-12 text-white mx-auto mb-2 hover:scale-110 transition-transform" />
+                    <p className="text-white text-sm">Play Session</p>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -172,14 +215,18 @@ export default function VideoBox({
 
           {/* View Session Button */}
           <RippleButton 
-            onClick={handleFullscreen}
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white border-purple-600 hover:border-purple-500 text-xs font-medium mt-2"
-            rippleColor="#ffffff"
+            onClick={!hasError ? handleFullscreen : undefined}
+            className={`w-full text-xs font-medium mt-2 ${
+              hasError 
+                ? "bg-gray-600 text-gray-400 cursor-not-allowed border-gray-600" 
+                : "bg-purple-600 hover:bg-purple-500 text-white border-purple-600 hover:border-purple-500"
+            }`}
+            rippleColor={hasError ? "#666666" : "#ffffff"}
             duration="600ms"
           >
             <div className="flex items-center justify-center gap-2">
               <Maximize className="w-3 h-3" />
-              <span>View Fullscreen</span>
+              <span>{hasError ? "Demo Content" : "View Fullscreen"}</span>
             </div>
           </RippleButton>
         </div>
