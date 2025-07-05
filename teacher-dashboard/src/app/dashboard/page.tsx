@@ -15,6 +15,7 @@ import SystemHealthMarquee from "@/components/SystemHealthMarquee";
 import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { RippleButton } from "@/components/magicui/ripple-button";
 import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
 export default function Dashboard() {
   const { data, loading, error } = useDashboardData();
@@ -296,7 +297,7 @@ const engagementKPI = {
       {/* Live Settings Popup */}
       {showConfigMessage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
+          <div className="relative bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4 overflow-hidden">
             <div className="flex items-center gap-2 mb-4">
               <Zap className="w-5 h-5 text-emerald-400" />
               <h3 className="text-lg font-semibold text-emerald-400">Live Settings</h3>
@@ -362,6 +363,18 @@ const engagementKPI = {
                 </div>
               </RippleButton>
             </div>
+            <BorderBeam
+              duration={6}
+              size={400}
+              className="from-transparent via-emerald-500 to-transparent"
+            />
+            <BorderBeam
+              duration={6}
+              delay={3}
+              size={400}
+              borderWidth={2}
+              className="from-transparent via-purple-500 to-transparent"
+            />
           </div>
         </div>
       )}
