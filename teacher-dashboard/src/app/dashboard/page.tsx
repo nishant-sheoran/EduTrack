@@ -7,13 +7,14 @@ import ChartBox from "../../components/ChartBox";
 import TranscriptList from "../../components/TranscriptList";
 import ConfigPanel from "../../components/ConfigPanel";
 import VideoBox from "../../components/VideoBox";
-import { Users, TrendingUp, Video, FileText, Eye, BookOpen, Zap } from "lucide-react";
+import { Users, TrendingUp, Video, FileText, Eye, BookOpen, Zap, Sparkles } from "lucide-react";
 import { useDashboardData } from "../../hooks/useDashboardData";
 import { useRealTimeKPIs } from "../../hooks/useRealTimeKPIs";
 import { useConfig } from "../../contexts/ConfigContext";
 import SystemHealthMarquee from "@/components/SystemHealthMarquee";
 import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { RippleButton } from "@/components/magicui/ripple-button";
+import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
 
 export default function Dashboard() {
   const { data, loading, error } = useDashboardData();
@@ -195,6 +196,30 @@ const engagementKPI = {
         summaryLabel="Avg Engagement"
         href="/engagement-timeline"
       />,
+    },
+    {
+      Icon: Sparkles,
+      name: "",
+      description: "",
+      href: "",
+      cta: "",
+      className: "col-span-1",
+      background: (
+        <div className="bg-gray-800 rounded-xl p-2 shadow-lg h-full flex items-center justify-center">
+          <ScratchToReveal
+            width={400}
+            height={220}
+            minScratchPercentage={70}
+            className="flex items-center justify-center overflow-hidden rounded-lg"
+            gradientColors={["#A97CF8", "#F38CB8", "#FDCC92"]}
+          >
+            <div className="text-center">
+              <div className="text-6xl mb-2">🎉</div>
+              <p className="text-lg font-bold text-white mb-1">Awesome Teaching!</p>
+            </div>
+          </ScratchToReveal>
+        </div>
+      ),
     },
     {
       Icon: FileText,

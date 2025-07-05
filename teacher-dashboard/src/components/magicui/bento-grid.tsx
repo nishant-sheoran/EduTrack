@@ -43,10 +43,11 @@ const BentoCard = ({
   cta,
   ...props
 }: BentoCardProps) => {
-  // Special handling for KPI and Config Panel to remove overlays
+  // Special handling for KPI, Config Panel, and scratch cards to remove overlays
   const isKPI = name === "Live Attendance" || name === "Live Engagement" || name === "Students in Frame";
   const isConfig = name === "Config Panel";
-  if (isKPI || isConfig) {
+  const isScratchCard = name === "" || name === "Scratch to Reveal";
+  if (isKPI || isConfig || isScratchCard) {
     return (
       <div
         key={name}
