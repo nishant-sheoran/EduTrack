@@ -20,6 +20,8 @@ module.exports = {
       animation: {
         "marquee": "marquee var(--duration,30s) linear infinite",
         "marquee-vertical": "marquee-vertical var(--duration,30s) linear infinite",
+        "pulse": "pulse var(--duration,1.5s) ease-out infinite",
+        "rippling": "rippling var(--duration,600ms) ease-out",
       },
       keyframes: {
         "marquee": {
@@ -29,6 +31,14 @@ module.exports = {
         "marquee-vertical": {
           "0%": { transform: "translateY(0%)" },
           "100%": { transform: "translateY(-50%)" },
+        },
+        "pulse": {
+          "0%, 100%": { boxShadow: "0 0 0 0 var(--pulse-color)" },
+          "50%": { boxShadow: "0 0 0 8px var(--pulse-color)" },
+        },
+        "rippling": {
+          "0%": { opacity: "1" },
+          "100%": { transform: "scale(2)", opacity: "0" },
         },
       },
       colors: {

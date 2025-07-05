@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
-import { Play, Calendar, Clock, Users, BookOpen, Eye } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Play, Calendar, Clock, Users, BookOpen, Eye, Maximize, Pause, X } from "lucide-react";
+import { RippleButton } from "./magicui/ripple-button";
 
 interface VideoBoxProps {
   sessionDate?: string;
@@ -10,6 +11,7 @@ interface VideoBoxProps {
   totalStudents?: number;
   topics?: string[];
   subject?: string;
+  videoUrl?: string;
 }
 
 export default function VideoBox({
@@ -18,8 +20,40 @@ export default function VideoBox({
   studentsPresent = 28,
   totalStudents = 30,
   topics = ["Algebra", "Quadratic Equations", "Problem Solving"],
-  subject = "Mathematics"
+  subject = "Mathematics",
+  videoUrl = "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4"
 }: VideoBoxProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlayPause = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleFullscreen = () => {
+    setIsFullscreen(true);
+    if (videoRef.current) {
+      if (videoRef.current.requestFullscreen) {
+        videoRef.current.requestFullscreen();
+      }
+    }
+  };
+
+  const handleExitFullscreen = () => {
+    setIsFullscreen(false);
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  };
+
   return (
     <div className="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col h-full hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-3">
@@ -31,17 +65,61 @@ export default function VideoBox({
       </div>
 
       <div className="flex-1 space-y-3">
-        {/* Video Placeholder */}
-        <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <Play className="w-8 h-8 text-gray-400 mx-auto mb-1" />
-              <p className="text-gray-400 text-xs">Session Video</p>
+        {/* Video Player */}
+        <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video cursor-pointer">
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            poster=""
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => setIsPlaying(false)}
+          >
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          
+          {/* Play Button Overlay */}
+          {!isPlaying && (
+            <div 
+              className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 hover:bg-opacity-60 transition-all"
+              onClick={handlePlayPause}
+            >
+              <div className="text-center">
+                <Play className="w-12 h-12 text-white mx-auto mb-2 hover:scale-110 transition-transform" />
+                <p className="text-white text-sm">Play Session</p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Video Controls Overlay */}
+          {isPlaying && (
+            <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 transition-all group">
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={handlePlayPause}
+                  className="p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all"
+                >
+                  <Pause className="w-8 h-8 text-white" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Duration Badge */}
           <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 px-2 py-1 rounded text-xs text-white">
             {duration}
           </div>
+
+          {/* Fullscreen Exit Button (only visible in fullscreen) */}
+          {isFullscreen && (
+            <button
+              onClick={handleExitFullscreen}
+              className="absolute top-4 right-4 p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+          )}
         </div>
 
         {/* Session Details */}
@@ -93,10 +171,17 @@ export default function VideoBox({
           </div>
 
           {/* View Session Button */}
-          <button className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white text-xs btn-interactive mt-2">
-            <Eye className="w-3 h-3" />
-            View Session
-          </button>
+          <RippleButton 
+            onClick={handleFullscreen}
+            className="w-full bg-purple-600 hover:bg-purple-500 text-white border-purple-600 hover:border-purple-500 text-xs font-medium mt-2"
+            rippleColor="#ffffff"
+            duration="600ms"
+          >
+            <div className="flex items-center justify-center gap-2">
+              <Maximize className="w-3 h-3" />
+              <span>View Fullscreen</span>
+            </div>
+          </RippleButton>
         </div>
       </div>
     </div>

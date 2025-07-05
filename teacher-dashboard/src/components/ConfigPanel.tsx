@@ -4,6 +4,7 @@ import React from "react";
 import { Settings, Users, BookOpen, Video, Zap, Save } from "lucide-react";
 import { useConfig } from "../contexts/ConfigContext";
 import { useToast } from "../contexts/ToastContext";
+import { RippleButton } from "./magicui/ripple-button";
 
 export default function ConfigPanel() {
   const { config, updateConfig } = useConfig();
@@ -117,13 +118,17 @@ export default function ConfigPanel() {
 
       {/* Save Button */}
       <div className="mt-3">
-        <button
+        <RippleButton
           onClick={handleSave}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white text-xs btn-interactive"
+          className="w-full bg-blue-600 hover:bg-blue-500 text-white border-blue-600 hover:border-blue-500 text-xs font-medium"
+          rippleColor="#ffffff"
+          duration="600ms"
         >
-          <Save className="w-3 h-3" />
-          Save
-        </button>
+          <div className="flex items-center justify-center gap-2">
+            <Save className="w-3 h-3" />
+            <span>Save</span>
+          </div>
+        </RippleButton>
       </div>
     </div>
   );

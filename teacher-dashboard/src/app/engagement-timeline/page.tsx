@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, TrendingUp, Calendar, Users, BarChart3 } from "lucide-react";
+import { ArrowLeft, TrendingUp, Calendar, Users } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import Link from "next/link";
 

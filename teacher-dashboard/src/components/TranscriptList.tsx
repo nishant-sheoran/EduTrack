@@ -3,6 +3,7 @@
 import React from "react";
 import { Download, FileText, Calendar, HardDrive } from "lucide-react";
 import { useToast } from "../contexts/ToastContext";
+import { RippleButton } from "./magicui/ripple-button";
 
 interface Transcript {
   id: string;
@@ -107,13 +108,15 @@ export default function TranscriptList({
                     </div>
                   </div>
                 </div>
-                <button
+                <RippleButton
                   onClick={() => handleDownload(transcript)}
-                  className="p-2 rounded-lg bg-blue-600 hover:bg-blue-500 btn-interactive flex-shrink-0"
+                  className="bg-blue-600 hover:bg-blue-500 text-white border-blue-600 hover:border-blue-500 flex-shrink-0"
+                  rippleColor="#ffffff"
+                  duration="600ms"
                   title={`Download ${transcript.name}`}
                 >
                   <Download className="w-3 h-3 text-white" />
-                </button>
+                </RippleButton>
               </div>
             </div>
           ))

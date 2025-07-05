@@ -48,7 +48,26 @@
     transform: translateY(calc(-100% - var(--gap)));
     }
   }
-}
+  --animate-pulse: pulse var(--duration) ease-out infinite
+;
+  @keyframes pulse {
+  0%, 100% {
+    boxShadow: 0 0 0 0 var(--pulse-color);
+    }
+  50% {
+    boxShadow: 0 0 0 8px var(--pulse-color);
+    }
+  }
+  --animate-rippling: rippling var(--duration) ease-out;
+  @keyframes rippling {
+  0% {
+    opacity: 1;
+    }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+    }
+  }}
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -79,7 +98,6 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
 
 @layer components {
   /* Custom button interactions */
@@ -126,7 +144,7 @@ body {
   }
 
   /* Loading animation */
-  @keyframes pulse {
+  @keyframes pulse-slow {
     0%, 100% {
       opacity: 1;
     }
@@ -136,7 +154,38 @@ body {
   }
 
   .animate-pulse-slow {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Button animations */
+  @keyframes button-pulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 var(--pulse-color);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px transparent;
+    }
+  }
+
+  @keyframes button-ripple {
+    0% {
+      opacity: 1;
+      transform: scale(0);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2);
+    }
+  }
+
+  .animate-button-pulse {
+    animation: button-pulse var(--duration, 2s) ease-out infinite;
+  }
+
+  .animate-button-ripple {
+    animation: button-ripple var(--duration, 600ms) ease-out;
   }
 } 
 

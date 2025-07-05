@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, Smile, Heart, Meh, Frown, Brain, Users, AlertTriangle, TrendingUp, BarChart3 } from "lucide-react";
+import { ArrowLeft, Smile, Users, AlertTriangle, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell } from "recharts";
 import Link from "next/link";
 
@@ -87,7 +87,7 @@ export default function EmotionDistributionPage() {
         </Link>
         
         <div className="flex items-center gap-3 mb-2">
-          <BarChart3 className="w-8 h-8 text-yellow-400" />
+          <TrendingUp className="w-8 h-8 text-yellow-400" />
           <h1 className="text-3xl font-bold">Emotion Distribution</h1>
         </div>
         

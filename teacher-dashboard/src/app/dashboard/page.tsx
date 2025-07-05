@@ -12,10 +12,12 @@ import { useDashboardData } from "../../hooks/useDashboardData";
 import { useRealTimeKPIs } from "../../hooks/useRealTimeKPIs";
 import { useConfig } from "../../contexts/ConfigContext";
 import SystemHealthMarquee from "@/components/SystemHealthMarquee";
+import { PulsatingButton } from "@/components/magicui/pulsating-button";
+import { RippleButton } from "@/components/magicui/ripple-button";
 
 export default function Dashboard() {
   const { data, loading, error } = useDashboardData();
-  const { kpis: realTimeKPIs, loading: kpisLoading } = useRealTimeKPIs();
+  const { kpis: realTimeKPIs } = useRealTimeKPIs();
   const { config, updateConfig } = useConfig();
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [isAnalyticsActive, setIsAnalyticsActive] = useState(false);
@@ -238,16 +240,23 @@ const engagementKPI = {
               Last updated: {new Date(realTimeKPIs.lastUpdated).toLocaleTimeString()}
             </div>
           )}
-          <button
-            onClick={handleToggleAnalytics}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              isAnalyticsActive 
-                ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-green-500 hover:bg-green-600 text-white'
-            }`}
-          >
-            {isAnalyticsActive ? 'Stop' : 'Start'}
-          </button>
+          {isAnalyticsActive ? (
+            <button
+              onClick={handleToggleAnalytics}
+              className="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-red-500 hover:bg-red-600 text-white"
+            >
+              Stop
+            </button>
+          ) : (
+            <PulsatingButton
+              onClick={handleToggleAnalytics}
+              className="bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600 text-sm font-medium"
+              pulseColor="#10b981"
+              duration="2s"
+            >
+              Start
+            </PulsatingButton>
+          )}
         </div>
       </div>
       <BentoGrid>
@@ -317,12 +326,16 @@ const engagementKPI = {
               >
                 Cancel
               </button>
-              <button
+              <RippleButton
                 onClick={handleApplySettings}
-                className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white text-sm transition-colors"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600 hover:border-emerald-500 text-sm font-medium"
+                rippleColor="#ffffff"
+                duration="600ms"
               >
-                Apply & Start
-              </button>
+                <div className="flex items-center justify-center gap-2">
+                  <span>Apply & Start</span>
+                </div>
+              </RippleButton>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import React from "react";
 import { Wifi, HardDrive, MemoryStick, RefreshCw, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { useSystemHealth } from "../hooks/useSystemHealth";
 import { useToast } from "../contexts/ToastContext";
+import { RippleButton } from "./magicui/ripple-button";
 
 export default function SystemHealthPanel() {
   const { health, loading, refresh } = useSystemHealth();
@@ -43,13 +44,15 @@ export default function SystemHealthPanel() {
     <div className="bg-gray-800 rounded-xl p-4 shadow-lg flex flex-col h-full hover:shadow-xl transition-all duration-300">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-white">System Health</span>
-        <button 
+        <RippleButton 
           onClick={handleRefresh}
-          className="p-1 rounded bg-gray-700 hover:bg-gray-600 btn-interactive"
+          className="bg-gray-700 hover:bg-gray-600 text-white border-gray-700 hover:border-gray-600"
+          rippleColor="#ffffff"
+          duration="600ms"
           disabled={loading}
         >
           <RefreshCw className={`w-3 h-3 text-white ${loading ? 'animate-spin' : ''}`} />
-        </button>
+        </RippleButton>
       </div>
 
       <div className="space-y-3 flex-1 text-xs">
