@@ -80,9 +80,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities; 
 
 @layer components {
   /* Custom button interactions */
@@ -145,7 +142,7 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
     @apply bg-background text-foreground;

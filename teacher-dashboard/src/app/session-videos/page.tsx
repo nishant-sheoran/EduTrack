@@ -2,6 +2,8 @@
 
 import React from "react";
 import VideoBox from "@/components/VideoBox";
+import { ArrowLeft, Video } from "lucide-react";
+import Link from "next/link";
 
 interface VideoData {
   id: string;
@@ -67,8 +69,24 @@ export default function SessionVideosPage() {
   const sortedVideos = [...videos].sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime());
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Session Videos (Newest to Oldest)</h1>
+    <main className="min-h-screen bg-gray-900 text-white p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <Link href="/dashboard" className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors mb-4">
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </Link>
+        
+        <div className="flex items-center gap-3 mb-2">
+          <Video className="w-8 h-8 text-red-400" />
+          <h1 className="text-3xl font-bold">Session Videos</h1>
+        </div>
+        
+        <p className="text-gray-400">
+          Browse all recorded session videos, sorted from newest to oldest. Monitor student engagement and review class performance.
+        </p>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {sortedVideos.map((video) => (
           <VideoBox

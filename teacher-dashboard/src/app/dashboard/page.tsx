@@ -131,7 +131,7 @@ const engagementKPI = {
       name: "Session Video",
       description: "Current session video and details.",
       href: "/session-videos",
-      cta: "Watch",
+      cta: "Watch all",
       className: "col-span-2 row-span-2",
       background: <VideoBox {...data.videoSession} subject={config.currentSubject} />,
     },
@@ -148,20 +148,38 @@ const engagementKPI = {
     {
       Icon: TrendingUp,
       name: "Engagement Timeline",
-      description: "Engagement over time.",
-      href: "#chart1",
-      cta: "See chart",
-      className: "col-span-3 lg:col-span-2",
-      background: <ChartBox type="line" data={data.charts.engagement} title="Engagement Timeline" dataKey="engagement" accentColor="#34d399" />,
+      description: "",
+      href: "/engagement-timeline",
+      cta: "See all",
+      className: "col-span-1",
+      background: <ChartBox 
+        type="line" 
+        data={data.charts.engagement} 
+        title="Engagement Timeline" 
+        dataKey="engagement" 
+        accentColor="#34d399" 
+        summaryValue="83%"
+        summaryLabel="Avg Engagement"
+        href="/engagement-timeline"
+      />,
     },
     {
       Icon: FileText,
       name: "Emotion Distribution",
-      description: "Distribution of emotions detected.",
-      href: "#chart2",
-      cta: "See chart",
-      className: "col-span-3 lg:col-span-2",
-      background: <ChartBox type="bar" data={data.charts.emotions} title="Emotion Distribution" dataKey="count" accentColor="#f59e0b" />,
+      description: "",
+      href: "/emotion-distribution",
+      cta: "See all",
+      className: "col-span-1",
+      background: <ChartBox 
+        type="bar" 
+        data={data.charts.emotions} 
+        title="Emotion Distribution" 
+        dataKey="count" 
+        accentColor="#f59e0b" 
+        summaryValue="27"
+        summaryLabel="Positive Emotions"
+        href="/emotion-distribution"
+      />,
     },
   ];
 
