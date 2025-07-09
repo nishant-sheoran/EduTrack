@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchRealTimeEngagement, calculateRealTimeKPIs } from '../lib/mockData';
+import { fetchRealTimeEngagement, calculateRealTimeKPIs, calculateEmotionChartData } from '../lib/mockData';
 import { useConfig } from '../contexts/ConfigContext';
 
 export interface RealTimeKPIs {
+  totStudents: number;
   attendance: {
     value: string;
     delta: number;
@@ -11,7 +12,7 @@ export interface RealTimeKPIs {
     value: string;
     delta: number;
   };
-  studentsInFrame: number;
+  emotions: Array<{ name: string; count: number }>;
   lastUpdated: string;
 }
 
@@ -28,14 +29,17 @@ export function useRealTimeKPIs() {
       
       // Calculate KPIs based on teacher's total students input and detected students
       const calculatedKPIs = calculateRealTimeKPIs(
-        config.totalStudents,
-        engagementData.studentsInFrame,
-        engagementData.detectedFaces
+        config.classStrength,
+        engagementData.totalStudents,
+        engagementData.detectedFaces,
       );
 
+      const emotionChart = calculateEmotionChartData(engagementData.detectedFaces);
+
       setKpis({
+        totStudents: engagementData.totalStudents,
         ...calculatedKPIs,
-        studentsInFrame: engagementData.studentsInFrame,
+        emotions: emotionChart,
         lastUpdated: engagementData.lastUpdated,
       });
     } catch (err) {
@@ -43,11 +47,11 @@ export function useRealTimeKPIs() {
     } finally {
       setLoading(false);
     }
-  }, [config.totalStudents]);
+  }, [config.classStrength]);
 
   useEffect(() => {
     fetchKPIs();
-  }, [config.totalStudents, fetchKPIs]); // Refetch when total students changes
+  }, [config.classStrength, fetchKPIs]); // Refetch when total students changes
 
   // Update KPIs every 5 seconds for real-time feeling
   useEffect(() => {
@@ -56,7 +60,7 @@ export function useRealTimeKPIs() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [config.totalStudents, fetchKPIs]);
+  }, [config.classStrength, fetchKPIs]);
 
   return {
     kpis,

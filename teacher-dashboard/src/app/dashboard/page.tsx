@@ -20,12 +20,11 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 export default function Dashboard() {
   const { data, loading, error } = useDashboardData();
   const { kpis: realTimeKPIs } = useRealTimeKPIs();
-  const { config, updateConfig } = useConfig();
+  const { config, updateConfig, isAnalyticsActive, setIsAnalyticsActive } = useConfig();
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const [isAnalyticsActive, setIsAnalyticsActive] = useState(false);
   const [showConfigMessage, setShowConfigMessage] = useState(false);
-  const [popupStudents, setPopupStudents] = useState(0);
-  const [popupSubject, setPopupSubject] = useState('');
+  const [popupStudents, setPopupStudents] = useState(config.classStrength);
+  const [popupSubject, setPopupSubject] = useState(config.currentSubject);
 
   useEffect(() => {
     if (!loading && data) {
@@ -36,7 +35,7 @@ export default function Dashboard() {
   const handleToggleAnalytics = () => {
     if (!isAnalyticsActive) {
       // Show popup when starting - initialize with current config values
-      setPopupStudents(config.totalStudents);
+      setPopupStudents(config.classStrength);
       setPopupSubject(config.currentSubject);
       setShowConfigMessage(true);
     } else {
@@ -46,9 +45,9 @@ export default function Dashboard() {
 
   const handleApplySettings = () => {
     // Apply the settings from popup to main config
-    updateConfig({ 
-      totalStudents: popupStudents, 
-      currentSubject: popupSubject 
+    updateConfig({
+      classStrength: popupStudents,
+      currentSubject: popupSubject
     });
     
     // Start analytics and close popup
@@ -72,8 +71,8 @@ export default function Dashboard() {
       <main className="min-h-screen bg-gray-900 text-white p-6 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 mb-4">Error loading dashboard: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg"
           >
             Retry
@@ -92,30 +91,30 @@ export default function Dashboard() {
   }
 
   // Use real-time KPIs only if analytics are active, otherwise use static values
-const attendanceKPI = {
+  const attendanceKPI = {
     title: "Live Attendance",
     value: isAnalyticsActive ? (realTimeKPIs?.attendance.value || data.kpis.attendance.value) : data.kpis.attendance.value,
     delta: isAnalyticsActive ? (realTimeKPIs?.attendance.delta || data.kpis.attendance.delta) : 0,
-  icon: <Users />,
-  accentColor: "text-emerald-400",
-};
+    icon: <Users />,
+    accentColor: "text-emerald-400",
+  };
 
-const engagementKPI = {
+  const engagementKPI = {
     title: "Live Engagement",
     value: isAnalyticsActive ? (realTimeKPIs?.engagement.value || data.kpis.engagement.value) : data.kpis.engagement.value,
     delta: isAnalyticsActive ? (realTimeKPIs?.engagement.delta || data.kpis.engagement.delta) : 0,
-  icon: <TrendingUp />,
-  accentColor: "text-blue-400",
-};
+    icon: <TrendingUp />,
+    accentColor: "text-blue-400",
+  };
 
   // Additional KPI to show students in frame
   const studentsInFrameKPI = {
     title: "Students in Frame",
-    value: isAnalyticsActive ? 
-      (realTimeKPIs ? `${realTimeKPIs.studentsInFrame}/${config.totalStudents}` : `${data.videoSession.studentsPresent}/${data.videoSession.totalStudents}`) :
-      `${data.videoSession.studentsPresent}/${data.videoSession.totalStudents}`,
-    delta: isAnalyticsActive ? 
-      (realTimeKPIs ? ((realTimeKPIs.studentsInFrame / config.totalStudents - 0.8) * 100) : 0) : 
+    value: isAnalyticsActive ?
+      (realTimeKPIs ? `${100}/${config.classStrength}` : `${data.videoSession.studentsPresent}/${config.classStrength}`) :
+      `${data.videoSession.studentsPresent}/${data.videoSession.classStrength}`,
+    delta: isAnalyticsActive ?
+      (realTimeKPIs ? ((100 / config.classStrength - 0.8) * 100) : 0) :
       0,
     icon: <Eye />,
     accentColor: "text-cyan-400",
@@ -187,12 +186,12 @@ const engagementKPI = {
       href: "/engagement-timeline",
       cta: "See all",
       className: "col-span-1",
-      background: <ChartBox 
-        type="line" 
-        data={data.charts.engagement} 
-        title="Engagement Timeline" 
-        dataKey="engagement" 
-        accentColor="#34d399" 
+      background: <ChartBox
+        type="line"
+        data={data.charts.engagement}
+        title="Engagement Timeline"
+        dataKey="engagement"
+        accentColor="#34d399"
         summaryValue="83%"
         summaryLabel="Avg Engagement"
         href="/engagement-timeline"
@@ -229,14 +228,13 @@ const engagementKPI = {
       href: "/emotion-distribution",
       cta: "See all",
       className: "col-span-1",
-      background: <ChartBox 
-        type="bar" 
-        data={data.charts.emotions} 
-        title="Emotion Distribution" 
-        dataKey="count" 
-        accentColor="#f59e0b" 
-        summaryValue="27"
-        summaryLabel="Positive Emotions"
+      background: <ChartBox
+        type="bar"
+        data={data.charts.emotions}
+        title="Emotion Distribution"
+        dataKey="count"
+        accentColor="#f59e0b"
+        summaryValue={realTimeKPIs?.totStudents?.toString() || "30"}
         href="/emotion-distribution"
       />,
     },
@@ -257,11 +255,11 @@ const engagementKPI = {
             Subject: <span className="text-white font-medium">{config.currentSubject}</span>
           </div>
           <div className="text-sm text-gray-400">
-            Class Size: <span className="text-white font-medium">{config.totalStudents} students</span>
+            Class Size: <span className="text-white font-medium">{config.classStrength} students</span>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          {realTimeKPIs && (
+          {realTimeKPIs && isAnalyticsActive && (
             <div className="text-xs text-gray-400">
               Last updated: {new Date(realTimeKPIs.lastUpdated).toLocaleTimeString()}
             </div>
@@ -380,4 +378,4 @@ const engagementKPI = {
       )}
     </main>
   );
-} 
+}

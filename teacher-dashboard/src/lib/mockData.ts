@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export interface DashboardData {
   kpis: {
     attendance: { value: string; delta: number };
@@ -7,7 +9,7 @@ export interface DashboardData {
   };
   charts: {
     engagement: Array<{ name: string; engagement: number }>;
-    emotions: Array<{ name: string; count: number }>;
+    emotions: Array<{ name:string; count: number }>;
     attendance: Array<{ name: string; attendance: number }>;
     performance: Array<{ name: string; score: number }>;
   };
@@ -29,17 +31,17 @@ export interface DashboardData {
     sessionDate: string;
     duration: string;
     studentsPresent: number;
-    totalStudents: number;
+    classStrength: number;
     topics: string[];
     videoUrl: string;
     subject: string;
   };
   realTimeEngagement: {
-    studentsInFrame: number;
+    totalStudents: number,
     lastUpdated: string;
     detectedFaces: Array<{
-      id: string;
-      engagementScore: number;
+      id: number;
+      engagement: string;
       emotion: string;
       timestamp: string;
     }>;
@@ -48,10 +50,10 @@ export interface DashboardData {
 
 export const mockDashboardData: DashboardData = {
   kpis: {
-    attendance: { value: "92.5%", delta: 2.1 },
-    engagement: { value: "87.3%", delta: -1.2 },
     sessions: { value: "156", delta: 8.5 },
     transcripts: { value: "89", delta: 12.3 },
+    attendance: { value: "0%", delta: 0 }, // placeholder, will be updated dynamically
+    engagement: { value: "0%", delta: 0 }, // placeholder, will be updated dynamically
   },
   charts: {
     engagement: [
@@ -143,21 +145,15 @@ export const mockDashboardData: DashboardData = {
     sessionDate: "2024-01-15",
     duration: "45:30",
     studentsPresent: 28,
-    totalStudents: 30,
+    classStrength: 30,
     topics: ["Algebra", "Quadratic Equations", "Problem Solving"],
     videoUrl: "#",
     subject: "Mathematics",
   },
   realTimeEngagement: {
-    studentsInFrame: 25,
+    totalStudents: 0,
     lastUpdated: new Date().toISOString(),
-    detectedFaces: [
-      { id: "face_1", engagementScore: 85, emotion: "focused", timestamp: new Date().toISOString() },
-      { id: "face_2", engagementScore: 72, emotion: "neutral", timestamp: new Date().toISOString() },
-      { id: "face_3", engagementScore: 90, emotion: "interested", timestamp: new Date().toISOString() },
-      { id: "face_4", engagementScore: 65, emotion: "confused", timestamp: new Date().toISOString() },
-      { id: "face_5", engagementScore: 88, emotion: "focused", timestamp: new Date().toISOString() },
-    ],
+    detectedFaces: [],
   },
 };
 
@@ -178,43 +174,64 @@ export const fetchSystemHealth = (): Promise<DashboardData['systemHealth']> => {
   });
 };
 
-// Engagement model simulation
-export const fetchRealTimeEngagement = (): Promise<DashboardData['realTimeEngagement']> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Simulate varying number of students in frame (20-30)
-      const studentsInFrame = Math.floor(Math.random() * 11) + 20;
-      
-      // Generate random engagement data for detected faces
-      const detectedFaces = Array.from({ length: Math.min(studentsInFrame, 10) }, (_, i) => ({
-        id: `face_${i + 1}`,
-        engagementScore: Math.floor(Math.random() * 40) + 60, // 60-100
-        emotion: ['focused', 'neutral', 'interested', 'confused', 'bored'][Math.floor(Math.random() * 5)],
-        timestamp: new Date().toISOString(),
-      }));
+interface RealtimeData {
+  present_ids: number[];
+  engagement: Array<{
+    id: string;
+    emotion: string;
+    engagement: string;
+  }>;
+}
 
-      resolve({
-        studentsInFrame,
-        lastUpdated: new Date().toISOString(),
-        detectedFaces,
-      });
-    }, 200);
-  });
+// Fetch real-time engagement data from the FastAPI server
+export const fetchRealTimeEngagement = async (): Promise<DashboardData['realTimeEngagement']> => {
+  try {
+    const response = await axios.get<RealtimeData>('http://127.0.0.1:8000/api/classroom/realtime');
+    const data = response.data;
+
+    console.log("API engagement response:", data.engagement);
+
+    const totalStudents = data.present_ids?.length || 0;
+    const lastUpdated = new Date().toISOString();
+
+    const detectedFaces = data.engagement.map((face) => ({
+      id: Number(face.id),
+      engagement: face.engagement.toLowerCase(), // "engaged" or "disengaged"
+      emotion: face.emotion,
+      timestamp: new Date().toISOString(),
+    }));
+
+    return {
+      totalStudents,
+      lastUpdated,
+      detectedFaces,
+    };
+
+  } catch (error) {
+    console.error("Error fetching real-time engagement data:", error);
+    return {
+      totalStudents: 0,
+      lastUpdated: new Date().toISOString(),
+      detectedFaces: [],
+    };
+  }
 };
+
 
 // Calculate real-time KPIs based on class size and detected students
 export const calculateRealTimeKPIs = (
-  totalStudents: number,
-  studentsInFrame: number,
+  classStrength: number,
+  totalStudents: DashboardData['realTimeEngagement']['totalStudents'],
   detectedFaces: DashboardData['realTimeEngagement']['detectedFaces']
 ) => {
   // Calculate attendance percentage
-  const attendancePercentage = Math.min((studentsInFrame / totalStudents) * 100, 100);
+  const attendancePercentage = classStrength > 0 ? Math.min((totalStudents / classStrength) * 100, 100) : 0;
   
   // Calculate average engagement from detected faces
-  const avgEngagement = detectedFaces.length > 0 
-    ? detectedFaces.reduce((sum, face) => sum + face.engagementScore, 0) / detectedFaces.length
-    : 0;
+  const avgEngagement = (() => {
+    const engagedCount = detectedFaces.filter(face => face.engagement === "engaged").length;
+    return totalStudents > 0 ? (engagedCount / totalStudents) * 100 : 0;
+  })();
 
   return {
     attendance: {
@@ -226,4 +243,18 @@ export const calculateRealTimeKPIs = (
       delta: Math.random() * 10 - 5, // Random delta for demo
     },
   };
-}; 
+};
+
+export const calculateEmotionChartData = (
+  detectedFaces: DashboardData['realTimeEngagement']['detectedFaces']
+): DashboardData['charts']['emotions'] => {
+  const emotionCountMap: Record<string, number> = {};
+
+  detectedFaces.forEach((face) => {
+    const emotion = face.emotion.toLowerCase(); // normalize casing
+    emotionCountMap[emotion] = (emotionCountMap[emotion] || 0) + 1;
+  });
+
+  return Object.entries(emotionCountMap).map(([name, count]) => ({ name, count }));
+};
+
