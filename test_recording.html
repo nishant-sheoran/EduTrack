@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduTrack Real-time Recording Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .stop-btn {
+            background-color: #f44336;
+        }
+        .stop-btn:hover {
+            background-color: #da190b;
+        }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.recording {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 2px solid #f8bbd9;
+        }
+        .status.idle {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #a5d6a7;
+        }
+        .status.processing {
+            background-color: #fff3e0;
+            color: #ef6c00;
+            border: 2px solid #ffcc02;
+        }
+        .status.completed {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 2px solid #90caf9;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .output {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .download-section {
+            background-color: #f0f8ff;
+            border: 2px solid #87ceeb;
+        }
+        .sessions-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .session-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .recording-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #f44336;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+            margin-right: 8px;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 EduTrack Real-time Recording Test</h1>
+        
+        <!-- Recording Controls -->
+        <div class="section">
+            <h2>🎙️ Recording Controls</h2>
+            <div>
+                <label for="topicHint">Topic Hint (optional):</label>
+                <input type="text" id="topicHint" placeholder="e.g., Linear Algebra, Machine Learning, Physics">
+            </div>
+            <div style="margin: 15px 0;">
+                <button id="startBtn" onclick="startRecording()">🎙️ Start Recording</button>
+                <button id="stopBtn" onclick="stopRecording()" disabled class="stop-btn">⏹️ Stop Recording</button>
+                <button onclick="getStatus()">📊 Check Status</button>
+            </div>
+            <div id="recordingStatus" class="status idle">🟢 Ready to record</div>
+        </div>
+
+        <!-- Session Management -->
+        <div class="section">
+            <h2>📋 Session Management</h2>
+            <button onclick="getAllSessions()">📜 View All Sessions</button>
+            <button onclick="clearOutput()">🗑️ Clear Output</button>
+            <div id="sessionsOutput" class="output"></div>
+        </div>
+
+        <!-- Results -->
+        <div class="section download-section">
+            <h2>📥 Latest Session Results</h2>
+            <div id="latestSessionInfo">No completed sessions yet.</div>
+            <div id="downloadLinks"></div>
+        </div>
+
+        <!-- Debug Output -->
+        <div class="section">
+            <h2>🔍 Debug Output</h2>
+            <div id="output" class="output">Ready to start...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let currentSessionId = null;
+        let statusInterval = null;
+
+        function log(message) {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `[${timestamp}] ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateRecordingStatus(isRecording, sessionId = null) {
+            const statusDiv = document.getElementById('recordingStatus');
+            const startBtn = document.getElementById('startBtn');
+            const stopBtn = document.getElementById('stopBtn');
+
+            if (isRecording) {
+                statusDiv.className = 'status recording';
+                statusDiv.innerHTML = '<span class="recording-indicator"></span>🔴 Recording in progress...';
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                currentSessionId = sessionId;
+                
+                // Start polling for status
+                if (statusInterval) clearInterval(statusInterval);
+                statusInterval = setInterval(getStatus, 2000);
+            } else {
+                statusDiv.className = 'status idle';
+                statusDiv.innerHTML = '🟢 Ready to record';
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                
+                // Stop polling
+                if (statusInterval) {
+                    clearInterval(statusInterval);
+                    statusInterval = null;
+                }
+            }
+        }
+
+        async function startRecording() {
+            try {
+                log('🎙️ Starting recording...');
+                
+                const response = await fetch(`${API_BASE}/recording/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    log(`✅ Recording started! Session ID: ${result.session_id}`);
+                    updateRecordingStatus(true, result.session_id);
+                } else {
+                    log(`❌ Failed to start recording: ${result.message}`);
+                }
+            } catch (error) {
+                log(`❌ Error starting recording: ${error.message}`);
+            }
+        }
+
+        async function stopRecording() {
+            try {
+                log('⏹️ Stopping recording...');
+                
+                const topicHint = document.getElementById('topicHint').value;
+                
+                const response = await fetch(`${API_BASE}/recording/stop`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        process_immediately: true,
+                        topic_hint: topicHint || null
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    log(`✅ Recording stopped! ${result.message}`);
+                    log(`📄 File saved: ${result.file_path}`);
+                    if (result.session_id) {
+                        log(`🔄 Processing session: ${result.session_id}`);
+                        // Start monitoring the session
+                        monitorSession(result.session_id);
+                    }
+                    updateRecordingStatus(false);
+                } else {
+                    log(`❌ Failed to stop recording: ${result.message}`);
+                    updateRecordingStatus(false);
+                }
+            } catch (error) {
+                log(`❌ Error stopping recording: ${error.message}`);
+                updateRecordingStatus(false);
+            }
+        }
+
+        async function getStatus() {
+            try {
+                const response = await fetch(`${API_BASE}/recording/status`);
+                const result = await response.json();
+                
+                log(`📊 Recording Status: ${result.is_recording ? 'Recording' : 'Idle'}`);
+                if (result.session_id) {
+                    log(`📋 Current Session: ${result.session_id}`);
+                }
+                log(`🔧 Recording Method: ${result.recording_method}`);
+                log(`🐍 PyAudio Available: ${result.pyaudio_available}`);
+                
+            } catch (error) {
+                log(`❌ Error getting status: ${error.message}`);
+            }
+        }
+
+        async function getAllSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions`);
+                const result = await response.json();
+                
+                const sessionsDiv = document.getElementById('sessionsOutput');
+                sessionsDiv.innerHTML = '';
+                
+                if (result.sessions && result.sessions.length > 0) {
+                    sessionsDiv.innerHTML += `<strong>Total Sessions: ${result.total_count}</strong>\n\n`;
+                    
+                    result.sessions.forEach(session => {
+                        const sessionInfo = `
+Session ID: ${session.session_id}
+Status: ${session.status}
+Created: ${new Date(session.created_at).toLocaleString()}
+Title: ${session.title || 'N/A'}
+Video: ${session.video_path ? '✅' : '❌'}
+PDF: ${session.pdf_path ? '✅' : '❌'}
+---
+`;
+                        sessionsDiv.innerHTML += sessionInfo;
+                        
+                        // Update latest session info if this is a completed session
+                        if (session.status === 'completed') {
+                            updateLatestSessionInfo(session);
+                        }
+                    });
+                } else {
+                    sessionsDiv.innerHTML = 'No sessions found.';
+                }
+                
+            } catch (error) {
+                log(`❌ Error getting sessions: ${error.message}`);
+            }
+        }
+
+        async function monitorSession(sessionId) {
+            const checkSession = async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/session/${sessionId}`);
+                    const session = await response.json();
+                    
+                    if (session.status === 'completed') {
+                        log(`🎉 Session ${sessionId} completed!`);
+                        log(`📹 Video: ${session.video_path}`);
+                        log(`📄 PDF: ${session.pdf_path}`);
+                        updateLatestSessionInfo(session);
+                        return; // Stop monitoring
+                    } else if (session.status === 'error') {
+                        log(`❌ Session ${sessionId} failed!`);
+                        return; // Stop monitoring
+                    } else {
+                        log(`🔄 Session ${sessionId} status: ${session.status}`);
+                        // Continue monitoring
+                        setTimeout(checkSession, 3000);
+                    }
+                } catch (error) {
+                    log(`❌ Error monitoring session: ${error.message}`);
+                }
+            };
+            
+            checkSession();
+        }
+
+        function updateLatestSessionInfo(session) {
+            const infoDiv = document.getElementById('latestSessionInfo');
+            const linksDiv = document.getElementById('downloadLinks');
+            
+            infoDiv.innerHTML = `
+                <strong>Session: ${session.session_id}</strong><br>
+                Title: ${session.title || 'N/A'}<br>
+                Status: ${session.status}<br>
+                Created: ${new Date(session.created_at).toLocaleString()}
+            `;
+            
+            let downloadHtml = '';
+            if (session.video_path) {
+                const videoFilename = session.video_path.split('/').pop().split('\\').pop();
+                downloadHtml += `<a href="${API_BASE}/download/video/${videoFilename}" target="_blank">
+                    <button>📹 Download Video</button>
+                </a>`;
+            }
+            if (session.pdf_path) {
+                const pdfFilename = session.pdf_path.split('/').pop().split('\\').pop();
+                downloadHtml += `<a href="${API_BASE}/download/pdf/${pdfFilename}" target="_blank">
+                    <button>📄 Download PDF</button>
+                </a>`;
+            }
+            
+            linksDiv.innerHTML = downloadHtml;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = 'Output cleared.\n';
+            document.getElementById('sessionsOutput').innerHTML = '';
+        }
+
+        // Initialize
+        log('🚀 Real-time recording test page loaded');
+        log('💡 Make sure the API server is running on http://localhost:8000');
+        log('🎙️ Click "Start Recording" to begin, then "Stop Recording" when done');
+        
+        // Check initial status
+        getStatus();
+    </script>
+</body>
+</html>

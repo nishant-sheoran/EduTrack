@@ -1,0 +1,13 @@
+@echo off
+REM Start API Server with Python Version Detection
+echo Starting EduTrack API Server...
+echo Checking Python version...
+
+python -c "import sys; v=sys.version_info; print(f'Python {v.major}.{v.minor}.{v.micro}')"
+python -c "import sys; v=sys.version_info; is_313plus = v >= (3, 13); print(f'Python 3.13+ compatibility mode: {is_313plus}')"
+
+echo Installing dependencies...
+pip install -r requirements.txt
+
+echo Starting FastAPI server...
+uvicorn api:app --reload
