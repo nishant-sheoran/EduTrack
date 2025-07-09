@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Upload Test</title>
+</head>
+<body>
+    <h1>Test Audio Upload</h1>
+    <form action="http://localhost:8000/upload-audio" method="post" enctype="multipart/form-data">
+        <input type="file" name="audio" accept="audio/*">
+        <br><br>
+        <button type="submit">Upload Audio</button>
+    </form>
+    
+    <h1>Generate Educational Video</h1>
+    <form action="http://localhost:8000/generate" method="post" enctype="multipart/form-data">
+        <input type="file" name="audio" accept="audio/*">
+        <br><br>
+        <label for="topic_hint">Topic Hint (optional):</label>
+        <input type="text" name="topic_hint" placeholder="e.g. Linear Regression, Poetry Analysis">
+        <br><br>
+        <button type="submit">Generate Educational Content</button>
+    </form>
+</body>
+</html>
