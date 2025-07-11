@@ -27,7 +27,7 @@ export function useDashboardData() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData();
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);

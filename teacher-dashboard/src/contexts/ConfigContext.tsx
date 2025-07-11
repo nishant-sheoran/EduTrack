@@ -7,21 +7,33 @@ export interface TeacherConfig {
   // Core class inputs for real-time calculations
   classStrength: number;
   currentSubject: string;
+  studentAttendance: number;
 
   // Existing config options
   videoQuality: string;
   animationStyle: string;
   autoSaveFrequency: number;
   engagementSensitivity: number;
+
+  // session inputs
+  session_duration: string
+
+  // Transcript inputs
+  transcriptURL: string
+  videoURL: string
 }
 
 const defaultConfig: TeacherConfig = {
   classStrength: 30,
+  studentAttendance: 28,
   currentSubject: "Mathematics",
   videoQuality: "HD",
   animationStyle: "Smooth",
   autoSaveFrequency: 5,
   engagementSensitivity: 75,
+  session_duration: "45:30",
+  transcriptURL: 'path/to/transcript',
+  videoURL: 'path/to/video',
 };
 
 interface ConfigContextType {

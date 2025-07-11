@@ -95,7 +95,6 @@ export default function SessionVideosPage() {
             duration={video.duration}
             studentsPresent={video.studentsPresent}
             totalStudents={video.totalStudents}
-            topics={video.topics}
             subject={video.subject}
           />
         ))}

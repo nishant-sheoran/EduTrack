@@ -32,7 +32,6 @@ export interface DashboardData {
     duration: string;
     studentsPresent: number;
     classStrength: number;
-    topics: string[];
     videoUrl: string;
     subject: string;
   };
@@ -52,8 +51,8 @@ export const mockDashboardData: DashboardData = {
   kpis: {
     sessions: { value: "156", delta: 8.5 },
     transcripts: { value: "89", delta: 12.3 },
-    attendance: { value: "0%", delta: 0 }, // placeholder, will be updated dynamically
-    engagement: { value: "0%", delta: 0 }, // placeholder, will be updated dynamically
+    attendance: { value: "0%", delta: 0 }, 
+    engagement: { value: "0%", delta: 0 }, 
   },
   charts: {
     engagement: [
@@ -146,7 +145,6 @@ export const mockDashboardData: DashboardData = {
     duration: "45:30",
     studentsPresent: 28,
     classStrength: 30,
-    topics: ["Algebra", "Quadratic Equations", "Problem Solving"],
     videoUrl: "#",
     subject: "Mathematics",
   },
@@ -186,7 +184,7 @@ interface RealtimeData {
 // Fetch real-time engagement data from the FastAPI server
 export const fetchRealTimeEngagement = async (): Promise<DashboardData['realTimeEngagement']> => {
   try {
-    const response = await axios.get<RealtimeData>('http://127.0.0.1:8000/api/classroom/realtime');
+    const response = await axios.get<RealtimeData>('http://127.0.0.1:8001/api/classroom/realtime');
     const data = response.data;
 
     console.log("API engagement response:", data.engagement);

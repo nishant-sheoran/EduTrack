@@ -16,6 +16,8 @@ import { PulsatingButton } from "@/components/magicui/pulsating-button";
 import { RippleButton } from "@/components/magicui/ripple-button";
 import { ScratchToReveal } from "@/components/magicui/scratch-to-reveal";
 import { BorderBeam } from "@/components/magicui/border-beam";
+import { v4 as uuidv4 } from 'uuid';
+import { useAnalyticsRecording } from "@/hooks/useAnalyticsRecording";
 
 export default function Dashboard() {
   const { data, loading, error } = useDashboardData();
@@ -25,6 +27,11 @@ export default function Dashboard() {
   const [showConfigMessage, setShowConfigMessage] = useState(false);
   const [popupStudents, setPopupStudents] = useState(config.classStrength);
   const [popupSubject, setPopupSubject] = useState(config.currentSubject);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const { sendAnalyticsState, recordingResult } = useAnalyticsRecording();
+  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+  const [sessionDuration, setSessionDuration] = useState<string>("00:00");
+
 
   useEffect(() => {
     if (!loading && data) {
@@ -34,14 +41,47 @@ export default function Dashboard() {
 
   const handleToggleAnalytics = () => {
     if (!isAnalyticsActive) {
-      // Show popup when starting - initialize with current config values
+      const newSessionId = `${uuidv4()}-${Date.now()}`;
+      setSessionId(newSessionId);
+  
+      // Start session time
+      setSessionStartTime(Date.now());
+  
+      // Set initial popup values
       setPopupStudents(config.classStrength);
       setPopupSubject(config.currentSubject);
       setShowConfigMessage(true);
+  
+      // Notify backend
+      sendAnalyticsState('start', newSessionId);
     } else {
       setIsAnalyticsActive(false);
+  
+      if (sessionId && sessionStartTime) {
+        const now = Date.now();
+        const diffInMs = now - sessionStartTime;
+        const totalSeconds = Math.floor(diffInMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+  
+        const formattedDuration = `${minutes.toString().padStart(2, '0')}:${seconds
+          .toString()
+          .padStart(2, '0')}`;
+        setSessionDuration(formattedDuration);
+  
+        updateConfig({ studentAttendance: realTimeKPIs?.totStudents, session_duration: formattedDuration });
+  
+        sendAnalyticsState('stop', sessionId);
+        if (recordingResult) {
+          updateConfig({ videoURL: recordingResult.videoUrl, transcriptURL: recordingResult.transcriptUrl });
+        }
+        
+        setSessionId(null);
+        setSessionStartTime(null); // reset start time
+      }
     }
   };
+  
 
   const handleApplySettings = () => {
     // Apply the settings from popup to main config

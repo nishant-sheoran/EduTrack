@@ -3,31 +3,39 @@
 import React, { useState, useRef } from "react";
 import { Play, Calendar, Clock, Users, BookOpen, Eye, Maximize, Pause, X } from "lucide-react";
 import { RippleButton } from "./magicui/ripple-button";
+import { useConfig } from "@/contexts/ConfigContext";
 
 interface VideoBoxProps {
   sessionDate?: string;
   duration?: string;
   studentsPresent?: number;
   totalStudents?: number;
-  topics?: string[];
   subject?: string;
   videoUrl?: string;
 }
 
 export default function VideoBox({
-  sessionDate = "2024-01-15",
-  duration = "45:30",
-  studentsPresent = 28,
-  totalStudents = 30,
-  topics = ["Algebra", "Quadratic Equations", "Problem Solving"],
-  subject = "Mathematics",
-  videoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  sessionDate,
+  duration,
+  studentsPresent,
+  totalStudents,
+  subject,
+  videoUrl,
 }: VideoBoxProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { config, updateConfig, isAnalyticsActive, setIsAnalyticsActive } = useConfig();
+
+  // Update the values
+  const finalSessionDate = Date.now().toString();
+  const finalSubject = subject ?? config.currentSubject ?? "Mathematics";
+  const finalStudentsPresent = studentsPresent ?? config.studentAttendance ?? 0;
+  const finalTotalStudents = totalStudents ?? config.classStrength ?? 30;
+  const finalDuration = duration ?? config.session_duration ?? "45:30";
+  const finalVideoURL = videoUrl ?? config.videoURL ?? "Rip!";
 
   const handlePlayPause = async () => {
     if (videoRef.current && !hasError) {
@@ -79,7 +87,7 @@ export default function VideoBox({
           <Play className="w-4 h-4 text-red-400" />
           <span className="text-sm font-semibold text-white">Latest Session</span>
         </div>
-        <span className="px-2 py-1 bg-blue-600 text-xs text-white rounded-full">{subject}</span>
+        <span className="px-2 py-1 bg-blue-600 text-xs text-white rounded-full">{finalSubject}</span>
       </div>
 
       <div className="flex-1 space-y-3">
@@ -171,11 +179,11 @@ export default function VideoBox({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 text-gray-300">
               <Calendar className="w-3 h-3" />
-              <span>{sessionDate}</span>
+              <span>{finalSessionDate}</span>
             </div>
             <div className="flex items-center gap-1 text-gray-300">
               <Clock className="w-3 h-3" />
-              <span>{duration}</span>
+              <span>{finalDuration}</span>
             </div>
           </div>
 
@@ -186,7 +194,7 @@ export default function VideoBox({
               {studentsPresent}/{totalStudents} students
             </span>
             <span className="text-gray-400 text-xs">
-              ({Math.round((studentsPresent / totalStudents) * 100)}%)
+              ({Math.round((finalStudentsPresent / finalTotalStudents) * 100)}%)
             </span>
           </div>
 
@@ -195,21 +203,6 @@ export default function VideoBox({
             <div className="flex items-center gap-1">
               <BookOpen className="w-3 h-3 text-green-400" />
               <span className="text-white font-medium text-xs">Topics:</span>
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {topics.slice(0, 2).map((topic, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-0.5 bg-gray-700 text-xs text-gray-300 rounded"
-                >
-                  {topic}
-                </span>
-              ))}
-              {topics.length > 2 && (
-                <span className="px-2 py-0.5 bg-gray-700 text-xs text-gray-300 rounded">
-                  +{topics.length - 2}
-                </span>
-              )}
             </div>
           </div>
 
