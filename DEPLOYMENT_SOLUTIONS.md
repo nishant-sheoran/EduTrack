@@ -70,6 +70,7 @@ docker-compose up -d
 **For verifying everything works:**
 ```bash
 # Run comprehensive system tests
+pip install -r test-system-requirements.txt
 python test-system.py
 ```
 

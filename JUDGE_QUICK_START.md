@@ -111,6 +111,22 @@ Once the system is running, you'll have **3 main interfaces**:
 - **Solution:** Get key from https://platform.openai.com
 - **Note:** Face detection and dashboard work without API key
 
+### **🔍 System Health Validation**
+
+#### **Run System Diagnostics**
+```bash
+# Install validation dependencies
+pip install -r test-system-requirements.txt
+
+# Run comprehensive system test
+python test-system.py
+```
+
+- **Purpose:** Validates all components and provides health report
+- **Duration:** 30-60 seconds
+- **Output:** Colored terminal output with pass/fail status
+- **Logs:** Detailed results saved to `logs/system_test_*.json`
+
 ### **Emergency Fallback Options**
 
 #### **Option 1: Individual Component Testing**

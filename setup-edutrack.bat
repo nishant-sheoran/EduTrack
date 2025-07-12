@@ -186,8 +186,26 @@ cd ..
 
 echo.
 
+:: Install test-system dependencies
+echo [STEP 6/8] Installing system validation tools...
+echo [INFO] Installing system validation tools... >> %LOGFILE%
+
+echo [INFO] Installing test-system dependencies...
+pip install --upgrade pip >> %LOGFILE% 2>&1
+pip install -r test-system-requirements.txt >> %LOGFILE% 2>&1
+if %errorLevel% neq 0 (
+    echo [WARNING] Failed to install test-system dependencies
+    echo [WARNING] test-system.py may not work properly
+    echo [WARNING] Failed to install test-system dependencies >> %LOGFILE%
+) else (
+    echo [OK] Test-system dependencies installed successfully
+)
+
+echo [OK] System validation tools setup complete
+echo.
+
 :: Create startup scripts
-echo [STEP 6/7] Creating startup scripts...
+echo [STEP 7/8] Creating startup scripts...
 echo [INFO] Creating startup scripts... >> %LOGFILE%
 
 :: Create start-all.bat
@@ -237,7 +255,7 @@ echo [OK] Startup scripts created
 echo.
 
 :: System validation
-echo [STEP 7/7] System validation...
+echo [STEP 8/8] System validation...
 echo [INFO] Performing system validation... >> %LOGFILE%
 
 :: Check Python packages

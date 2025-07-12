@@ -7,13 +7,21 @@ Validates all components and provides clear feedback for judges.
 import asyncio
 import json
 import time
-import requests
 import subprocess
 import sys
 from typing import Dict, List, Tuple
 from datetime import datetime
 import platform
 import os
+
+# Try to import requests, provide helpful error if missing
+try:
+    import requests
+except ImportError:
+    print("❌ Error: 'requests' library not found!")
+    print("Please install it with: pip install requests")
+    print("Or run: pip install -r test-system-requirements.txt")
+    sys.exit(1)
 
 # Colors for terminal output
 class Colors:

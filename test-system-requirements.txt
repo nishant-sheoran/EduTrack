@@ -1,0 +1,5 @@
+# Requirements for test-system.py
+# System health validation script dependencies
+
+requests>=2.25.0
+psutil>=5.8.0 

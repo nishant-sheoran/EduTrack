@@ -216,8 +216,26 @@ cd ..
 
 echo
 
+# Install test-system dependencies
+echo -e "${BLUE}[STEP 6/8] Installing system validation tools...${NC}"
+echo "[INFO] Installing system validation tools..." >> "$LOGFILE"
+
+echo -e "${BLUE}[INFO] Installing test-system dependencies...${NC}"
+pip install --upgrade pip >> "$LOGFILE" 2>&1
+pip install -r test-system-requirements.txt >> "$LOGFILE" 2>&1
+if [ $? -ne 0 ]; then
+    echo -e "${YELLOW}[WARNING] Failed to install test-system dependencies${NC}"
+    echo -e "${YELLOW}[WARNING] test-system.py may not work properly${NC}"
+    echo "[WARNING] Failed to install test-system dependencies" >> "$LOGFILE"
+else
+    echo -e "${GREEN}[OK] Test-system dependencies installed successfully${NC}"
+fi
+
+echo -e "${GREEN}[OK] System validation tools setup complete${NC}"
+echo
+
 # Create startup scripts
-echo -e "${BLUE}[STEP 6/7] Creating startup scripts...${NC}"
+echo -e "${BLUE}[STEP 7/8] Creating startup scripts...${NC}"
 echo "[INFO] Creating startup scripts..." >> "$LOGFILE"
 
 # Create start-all.sh
@@ -409,7 +427,7 @@ echo -e "${GREEN}[OK] Startup scripts created${NC}"
 echo
 
 # System validation
-echo -e "${BLUE}[STEP 7/7] System validation...${NC}"
+echo -e "${BLUE}[STEP 8/8] System validation...${NC}"
 echo "[INFO] Performing system validation..." >> "$LOGFILE"
 
 # Check Python packages

@@ -29,8 +29,8 @@
 - **Demo Visuals:** Check `docs/dash_stats.gif` and `docs/emotion_track.gif` for live system preview
 
 ### **🆘 If Setup Issues Occur**
-- **Run:** `python test-system.py` to validate system health
-- **Fallback:** Pre-recorded demo at `report&output/demo video.mp4` or check demo GIFs and report in `docs/report.pdf` folder
+- **Run:** `python test-system.py` to validate system health (requires `pip install -r test-system-requirements.txt`)
+- **Fallback:** Pre-recorded demo at ![Demo Video](http://bit.ly/4nFD8oJ) or check demo GIFs and report in `docs/report.pdf` folder
 - **Support:** Check [JUDGE_QUICK_START.md](JUDGE_QUICK_START.md) for troubleshooting
 
 ---
