@@ -26,10 +26,11 @@
 - **Teacher Dashboard:** http://localhost:3000 (Main evaluation interface)
 - **Engagement Monitor API:** http://localhost:8001/docs (Computer vision demo)
 - **Voice-to-Video API:** http://localhost:8000/docs (AI content generation)
+- **Demo Visuals:** Check `docs/dash_stats.gif` and `docs/emotion_track.gif` for live system preview
 
 ### **🆘 If Setup Issues Occur**
 - **Run:** `python test-system.py` to validate system health
-- **Fallback:** Pre-recorded demo at `report&output/demo video.mp4`
+- **Fallback:** Pre-recorded demo at `report&output/demo video.mp4` or check demo GIFs and report in `docs/report.pdf` folder
 - **Support:** Check [JUDGE_QUICK_START.md](JUDGE_QUICK_START.md) for troubleshooting
 
 ---
@@ -48,6 +49,20 @@ EduTrack is a **next-generation educational technology platform** that transform
 
 ---
 
+## 🎬 **Live System Demo**
+
+### **📊 Dashboard Live KPIs**
+*Real-time dashboard showing live engagement metrics from classroom monitoring models*
+
+![Dashboard Statistics](docs/dash_stats.gif)
+
+### **📈 Real-time Analytics**
+*Live emotion tracking and engagement analytics with beautiful Recharts visualizations*
+
+![Emotion Tracking](docs/emotion_track.gif)
+
+---
+
 ## 🏗️ **System Architecture**
 
 EduTrack follows a **microservices architecture** with three independent, scalable modules:
@@ -57,27 +72,27 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 │                            EduTrack System                                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
-│  │   📊 Classroom   │    │   🎓 Teacher    │    │  🎙️ Voice-to-   │        │
-│  │   Engagement    │    │    Dashboard    │    │  Video System   │        │
-│  │    Monitor      │    │                 │    │                 │        │
-│  │                 │    │                 │    │                 │        │
-│  │  • YOLOv8 Face  │    │  • Next.js UI   │    │  • OpenAI API   │        │
-│  │  • OpenVINO ML  │    │  • Live KPIs    │    │  • Manim Animations│      │
-│  │  • FastAPI      │    │  • Real-time    │    │  • MoviePy      │        │
-│  │                 │    │                 │    │                 │        │
-│  │  Port: 8001     │    │  Port: 3000     │    │  Port: 8000     │        │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
-│           │                       │                       │                │
-│           └───────────────────────┼───────────────────────┘                │
-│                                   │                                        │
-│                         ┌─────────▼─────────┐                             │
-│                         │   Data Flow Hub   │                             │
-│                         │                   │                             │
-│                         │ • Live Analytics  │                             │
-│                         │ • Session Data    │                             │
-│                         │ • Content URLs    │                             │
-│                         └───────────────────┘                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐          │
+│  │   📊 Classroom  │    │   🎓 Teacher   │    │  🎙️ Voice-to-   │         │
+│  │   Engagement    │    │    Dashboard    │    │  Video System   │          │
+│  │    Monitor      │    │                 │    │                 │          │
+│  │                 │    │                 │    │                 │          │
+│  │   YOLOv8 Face   │    │   Next.js UI    │    │    OpenAI API   │          │
+│  │   OpenVINO ML   │    │   Live KPIs     │    │    Manim        │          │
+│  │   FastAPI       │    │   Real-time     │    │    MoviePy      │          │
+│  │                 │    │                 │    │                 │          │
+│  │  Port: 8001     │    │  Port: 3000     │    │  Port: 8000     │          │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘          │
+│           │                       │                       │                 │
+│           └───────────────────────┼───────────────────────┘                 │
+│                                   │                                         │
+│                         ┌─────────▼─────────┐                               │
+│                         │   Data Flow Hub   │                               │
+│                         │                   │                               │
+│                         │   Live Analytics  │                               │
+│                         │   Session Data    │                               │
+│                         │   Content URLs    │                               │
+│                         └───────────────────┘                               │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -90,11 +105,11 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 
 **Real-time AI-powered student engagement tracking**
 
-- **🎯 Face Detection**: YOLOv8-powered real-time face detection with ONNX optimization
-- **👥 Attendance Tracking**: Automated attendance using DeepSORT multi-object tracking
-- **😊 Emotion Recognition**: Intel OpenVINO emotion classification (7 emotions)
-- **📐 Head Pose Analysis**: 3D head pose estimation for attention measurement
-- **⚡ Live API**: FastAPI endpoints for real-time data streaming
+- **Face Detection**: YOLOv8-powered real-time face detection with ONNX optimization
+- **Attendance Tracking**: Automated attendance using DeepSORT multi-object tracking
+- **Emotion Recognition**: Intel OpenVINO emotion classification
+- **Head Pose Analysis**: 3D head pose estimation for attention measurement
+- **Live API**: FastAPI endpoints for real-time data streaming
 
 **Technology Stack**: Python, FastAPI, OpenCV, YOLOv8, OpenVINO, DeepSORT
 
@@ -102,26 +117,28 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 
 **Modern, responsive web interface for educators**
 
-- **📈 Live KPIs**: Real-time attendance, engagement, and emotion metrics
-- **📊 Interactive Charts**: Beautiful visualizations with Recharts
-- **🎬 Video Management**: Session recording and playback capabilities
-- **📝 Transcript Management**: Automated transcript categorization and download
-- **⚙️ Configuration Panel**: Customizable settings and analytics controls
-- **🔄 Real-time Updates**: WebSocket integration for live data streaming
+- **Live KPIs**: Real-time attendance, engagement, and emotion metrics
+- **Interactive Charts**: Beautiful visualizations with Recharts
+- **Video Management**: Session recording and playback capabilities
+- **Transcript Management**: Automated transcript categorization and download
+- **Configuration Panel**: Customizable settings and analytics controls
+- **Real-time Updates**: WebSocket integration for live data streaming
 
 **Technology Stack**: Next.js 15, React 19, TypeScript, Tailwind CSS, Recharts
+
+> **💡 See it in action**: Check `docs/dash_stats.gif` for live dashboard KPIs and `docs/emotion_track.gif` for real-time analytics visualization
 
 ### 3. 🎙️ **Voice-to-Video Transcript System**
 
 **AI-powered educational content generation**
 
-- **🎤 Real-time Recording**: Server-side audio recording with device auto-detection
-- **📝 AI Transcription**: OpenAI Whisper for accurate speech-to-text
-- **🧠 Script Generation**: GPT-4 powered educational content structuring
-- **🎬 3Blue1Brown Animations**: Manim-generated mathematical visualizations
-- **🎵 Natural Narration**: High-quality text-to-speech with gTTS
-- **📄 PDF Generation**: LaTeX-enabled transcript documents
-- **🎥 Video Composition**: MoviePy audio/video merging
+- **Real-time Recording**: Server-side audio recording with device auto-detection
+- **AI Transcription**: OpenAI Whisper for accurate speech-to-text
+- **Script Generation**: GPT-4 powered educational content structuring
+- **3Blue1Brown Animations**: Manim-generated mathematical visualizations
+- **Natural Narration**: High-quality text-to-speech with gTTS
+- **PDF Generation**: LaTeX-enabled transcript documents
+- **Video Composition**: MoviePy audio/video merging
 
 **Technology Stack**: Python, FastAPI, OpenAI API, Manim, MoviePy, Streamlit
 
@@ -151,7 +168,7 @@ cd EduTrack
 # Then run: start-all.bat (Windows) or ./start-all.sh (Mac/Linux)
 ```
 
-### **📦 Manual Installation**
+### **Manual Installation**
 
 #### **1. Classroom Engagement Monitor**
 
@@ -384,9 +401,8 @@ const { kpis, loading, error } = useRealTimeKPIs();
 
 - **📋 [File Inventory](docs/File_Inventory.md)** - Comprehensive file listing and API documentation
 - **🏗️ [Architecture Overview](docs/Architecture.md)** - System design and data flow diagrams
-- **🚀 [API Reference](docs/API_Reference.md)** - Complete API documentation
-- **🎓 [User Guide](docs/User_Guide.md)** - Step-by-step usage instructions
-- **🔧 [Developer Guide](docs/Developer_Guide.md)** - Development setup and contribution guidelines
+- **📊 [Project Report](docs/report.pdf)** - Complete project documentation and technical analysis
+- **🎯 [Inline Improvements](docs/Inline_Improvements.md)** - Code documentation and enhancement suggestions
 
 ### **Quick References**
 
@@ -483,7 +499,6 @@ We welcome contributions from the community! Here's how to get started:
 - **🔧 Dependencies**: 150+ packages across all modules
 - **🎯 Supported Formats**: Audio (MP3, WAV, M4A), Video (MP4), Documents (PDF, MD)
 
----
 
 ---
 
@@ -504,28 +519,6 @@ We welcome contributions from the community! Here's how to get started:
 
 ---
 
-## 📄 **License**
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2024 EduTrack Contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
----
-
 ## 🙏 **Acknowledgments**
 
 ### **Technology Partners**
@@ -540,8 +533,6 @@ copies or substantial portions of the Software.
 - **SRMIST**: Academic support and research environment
 - **Open Source Community**: For the amazing tools and libraries
 - **Contributors**: All developers who contributed to this project
-
----
 
 ---
 
