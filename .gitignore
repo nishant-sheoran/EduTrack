@@ -1,0 +1,9 @@
+voice-to-video-transcript/.env
+voice-to-video-transcript/.env.example
+voice-to-video-transcript/myenv/
+clr_engage_montr/myenv/
+clr_engage_montr/test_images/
+clr_engage_montr/myenv2/
+clr_engage_montr/models/__pycache__/
+clr_engage_montr/models/__pycache__/face_detection.cpython-313.pyc
+clr_engage_montr/__pycache__/main.cpython-310.pyc

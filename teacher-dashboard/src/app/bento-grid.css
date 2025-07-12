@@ -1,0 +1,19 @@
+@layer utilities {
+  .bento-grid-areas {
+    @apply md:grid md:grid-cols-6 md:grid-rows-4 md:gap-4;
+    /* grid-template-areas for desktop */
+    grid-template-areas:
+      'kpi1 kpi1 kpi2 kpi2 video video'
+      'chart1 chart1 chart1 chart2 chart2 chart2'
+      'transcripts transcripts config config system system'
+      'transcripts transcripts config config system system';
+  }
+  .md\:[grid-area\:kpi1] { grid-area: kpi1; }
+  .md\:[grid-area\:kpi2] { grid-area: kpi2; }
+  .md\:[grid-area\:video] { grid-area: video; }
+  .md\:[grid-area\:chart1] { grid-area: chart1; }
+  .md\:[grid-area\:chart2] { grid-area: chart2; }
+  .md\:[grid-area\:transcripts] { grid-area: transcripts; }
+  .md\:[grid-area\:config] { grid-area: config; }
+  .md\:[grid-area\:system] { grid-area: system; }
+} 
