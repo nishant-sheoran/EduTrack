@@ -30,7 +30,7 @@
 
 ### **🆘 If Setup Issues Occur**
 - **Run:** `python test-system.py` to validate system health (requires `pip install -r test-system-requirements.txt`)
-- **Fallback:** Pre-recorded demo at ![Demo Video](http://bit.ly/4nFD8oJ) or check demo GIFs and report in `docs/report.pdf` folder
+- **Fallback:** Pre-recorded demo at [Demo Video](http://bit.ly/4nFD8oJ) or check demo GIFs and report in `docs/report.pdf` folder
 - **Support:** Check [JUDGE_QUICK_START.md](JUDGE_QUICK_START.md) for troubleshooting
 
 ---
