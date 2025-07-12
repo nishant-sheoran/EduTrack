@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # Engagement Monitor Service
+  engagement-monitor:
+    build:
+      context: ./clr_engage_montr
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./logs:/app/logs
+      - ./clr_engage_montr/models:/app/models
+    environment:
+      - PYTHONPATH=/app
+      - CONFIDENCE_THRESHOLD=0.45
+      - IOU_THRESHOLD=0.5
+      - MODEL_PRECISION=FP16
+      - LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - edutrack-network
+    restart: unless-stopped
+
+  # Teacher Dashboard Service
+  teacher-dashboard:
+    build:
+      context: ./teacher-dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_ENGAGEMENT_API_URL=http://localhost:8001
+      - NEXT_PUBLIC_VOICE_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_POLLING_INTERVAL=2000
+      - NEXT_PUBLIC_ANALYTICS_ENABLED=true
+      - NODE_ENV=production
+    depends_on:
+      engagement-monitor:
+        condition: service_healthy
+      voice-to-video:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+    networks:
+      - edutrack-network
+    restart: unless-stopped
+
+  # Voice-to-Video Service
+  voice-to-video:
+    build:
+      context: ./voice-to-video-transcript
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+      - ./voice-to-video-transcript/output:/app/output
+    environment:
+      - PYTHONPATH=/app
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=gpt-4
+      - WHISPER_MODEL=whisper-1
+      - MAX_FILE_SIZE=25MB
+      - ENABLE_MANIM=true
+      - DEFAULT_VOICE_SPEED=1.0
+      - LOG_LEVEL=INFO
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - edutrack-network
+    restart: unless-stopped
+
+  # System Health Monitor (Optional)
+  health-monitor:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/health-dashboard.html:/usr/share/nginx/html/index.html:ro
+    depends_on:
+      - engagement-monitor
+      - teacher-dashboard
+      - voice-to-video
+    networks:
+      - edutrack-network
+    restart: unless-stopped
+
+networks:
+  edutrack-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  logs:
+    driver: local
+  models:
+    driver: local
+  output:
+    driver: local
+
+# Development override for judges who want to see real-time logs
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+---
+# docker-compose.dev.yml content (for development/debugging)
+version: '3.8'
+
+services:
+  engagement-monitor:
+    volumes:
+      - ./clr_engage_montr:/app:ro
+    environment:
+      - DEBUG=true
+      - RELOAD=true
+    command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+
+  teacher-dashboard:
+    volumes:
+      - ./teacher-dashboard:/app:ro
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
+
+  voice-to-video:
+    volumes:
+      - ./voice-to-video-transcript:/app:ro
+    environment:
+      - DEBUG=true
+      - RELOAD=true
+    command: ["python", "-m", "uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
