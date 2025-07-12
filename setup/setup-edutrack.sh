@@ -13,9 +13,9 @@ echo -e "   Competition-Ready Installation"
 echo -e "========================================${NC}"
 echo
 
-# Create logs directory
-mkdir -p logs
-LOGFILE="logs/setup_$(date +%Y%m%d_%H%M%S).log"
+# Create logs directory in parent directory
+mkdir -p ../logs
+LOGFILE="../logs/setup_$(date +%Y%m%d_%H%M%S).log"
 
 echo "[INFO] Starting EduTrack setup at $(date)" >> "$LOGFILE"
 echo -e "${BLUE}[INFO] Log file: $LOGFILE${NC}"
@@ -53,7 +53,7 @@ handle_error() {
 }
 
 # Check system requirements
-echo -e "${BLUE}[STEP 1/7] Checking system requirements...${NC}"
+echo -e "${BLUE}[STEP 1/8] Checking system requirements...${NC}"
 echo "[INFO] Checking system requirements..." >> "$LOGFILE"
 
 # Check Python
@@ -101,7 +101,7 @@ echo -e "${GREEN}[OK] System requirements check complete${NC}"
 echo
 
 # Get OpenAI API Key
-echo -e "${BLUE}[STEP 2/7] OpenAI API Key Configuration...${NC}"
+echo -e "${BLUE}[STEP 2/8] OpenAI API Key Configuration...${NC}"
 echo "[INFO] Configuring OpenAI API Key..." >> "$LOGFILE"
 
 read -p "Enter your OpenAI API Key (press Enter to skip): " OPENAI_KEY
@@ -115,14 +115,14 @@ fi
 echo
 
 # Setup Engagement Monitor
-echo -e "${BLUE}[STEP 3/7] Setting up Classroom Engagement Monitor...${NC}"
+echo -e "${BLUE}[STEP 3/8] Setting up Classroom Engagement Monitor...${NC}"
 echo "[INFO] Setting up Engagement Monitor..." >> "$LOGFILE"
 
-if [ ! -d "clr_engage_montr" ]; then
+if [ ! -d "../clr_engage_montr" ]; then
     handle_error "clr_engage_montr directory not found!"
 fi
 
-cd clr_engage_montr
+cd ../clr_engage_montr
 
 # Create virtual environment
 echo -e "${BLUE}[INFO] Creating Python virtual environment...${NC}"
@@ -141,19 +141,19 @@ if [ $? -ne 0 ]; then
 fi
 
 echo -e "${GREEN}[OK] Engagement Monitor setup complete${NC}"
-cd ..
+cd ../setup
 
 echo
 
 # Setup Teacher Dashboard
-echo -e "${BLUE}[STEP 4/7] Setting up Teacher Dashboard...${NC}"
+echo -e "${BLUE}[STEP 4/8] Setting up Teacher Dashboard...${NC}"
 echo "[INFO] Setting up Teacher Dashboard..." >> "$LOGFILE"
 
-if [ ! -d "teacher-dashboard" ]; then
+if [ ! -d "../teacher-dashboard" ]; then
     handle_error "teacher-dashboard directory not found!"
 fi
 
-cd teacher-dashboard
+cd ../teacher-dashboard
 
 # Install Node.js dependencies
 echo -e "${BLUE}[INFO] Installing Dashboard dependencies...${NC}"
@@ -171,19 +171,19 @@ if [ $? -ne 0 ]; then
 fi
 
 echo -e "${GREEN}[OK] Teacher Dashboard setup complete${NC}"
-cd ..
+cd ../setup
 
 echo
 
 # Setup Voice-to-Video System
-echo -e "${BLUE}[STEP 5/7] Setting up Voice-to-Video System...${NC}"
+echo -e "${BLUE}[STEP 5/8] Setting up Voice-to-Video System...${NC}"
 echo "[INFO] Setting up Voice-to-Video System..." >> "$LOGFILE"
 
-if [ ! -d "voice-to-video-transcript" ]; then
+if [ ! -d "../voice-to-video-transcript" ]; then
     handle_error "voice-to-video-transcript directory not found!"
 fi
 
-cd voice-to-video-transcript
+cd ../voice-to-video-transcript
 
 # Create virtual environment
 echo -e "${BLUE}[INFO] Creating Python virtual environment...${NC}"
@@ -212,7 +212,7 @@ EOF
 fi
 
 echo -e "${GREEN}[OK] Voice-to-Video setup complete${NC}"
-cd ..
+cd ../setup
 
 echo
 
@@ -265,29 +265,29 @@ check_port 3000
 check_port 8000
 
 echo -e "${BLUE}[1/3] Starting Engagement Monitor on port 8001...${NC}"
-cd clr_engage_montr
+cd ../clr_engage_montr
 source venv/bin/activate
 nohup python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload > ../logs/engagement_monitor.log 2>&1 &
 ENGAGEMENT_PID=$!
 echo $ENGAGEMENT_PID > ../logs/engagement_monitor.pid
-cd ..
+cd ../setup
 sleep 5
 
 echo -e "${BLUE}[2/3] Starting Teacher Dashboard on port 3000...${NC}"
-cd teacher-dashboard
+cd ../teacher-dashboard
 nohup npm run dev > ../logs/teacher_dashboard.log 2>&1 &
 DASHBOARD_PID=$!
 echo $DASHBOARD_PID > ../logs/teacher_dashboard.pid
-cd ..
+cd ../setup
 sleep 5
 
 echo -e "${BLUE}[3/3] Starting Voice-to-Video System on port 8000...${NC}"
-cd voice-to-video-transcript
+cd ../voice-to-video-transcript
 source venv/bin/activate
 nohup python -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload > ../logs/voice_to_video.log 2>&1 &
 VOICE_PID=$!
 echo $VOICE_PID > ../logs/voice_to_video.pid
-cd ..
+cd ../setup
 sleep 3
 
 echo
@@ -300,8 +300,8 @@ echo "  Teacher Dashboard: http://localhost:3000"
 echo "  Engagement Monitor: http://localhost:8001"
 echo "  Voice-to-Video API: http://localhost:8000"
 echo
-echo "Process IDs saved in logs/ directory"
-echo "Use 'stop-all.sh' to stop all services"
+echo "Process IDs saved in ../logs/ directory"
+echo "Use './stop-all.sh' to stop all services"
 echo
 echo "Opening Teacher Dashboard in default browser..."
 sleep 2
@@ -318,7 +318,7 @@ else
 fi
 
 echo
-echo "Press Ctrl+C to stop all services or run 'stop-all.sh'"
+echo "Press Ctrl+C to stop all services or run './stop-all.sh'"
 echo
 
 # Wait for user interrupt
@@ -344,8 +344,8 @@ echo -e "${BLUE}Stopping EduTrack services...${NC}"
 
 # Function to stop service by PID file
 stop_service() {
-    if [ -f "logs/$1.pid" ]; then
-        PID=$(cat logs/$1.pid)
+    if [ -f "../logs/$1.pid" ]; then
+        PID=$(cat ../logs/$1.pid)
         if kill -0 $PID 2>/dev/null; then
             echo -e "${BLUE}[INFO] Stopping $1 (PID: $PID)...${NC}"
             kill -TERM $PID 2>/dev/null
@@ -354,7 +354,7 @@ stop_service() {
                 kill -KILL $PID 2>/dev/null
             fi
         fi
-        rm -f logs/$1.pid
+        rm -f ../logs/$1.pid
     fi
 }
 
@@ -432,57 +432,47 @@ echo "[INFO] Performing system validation..." >> "$LOGFILE"
 
 # Check Python packages
 echo -e "${BLUE}[INFO] Validating Python packages...${NC}"
-cd clr_engage_montr
+cd ../clr_engage_montr
 source venv/bin/activate
 python -c "import cv2, fastapi, numpy; print('Engagement Monitor packages OK')" >> "$LOGFILE" 2>&1
 if [ $? -ne 0 ]; then
     echo -e "${YELLOW}[WARNING] Some Engagement Monitor packages may have issues${NC}"
     echo "[WARNING] Engagement Monitor package validation failed" >> "$LOGFILE"
 fi
-cd ..
+cd ../setup
 
-cd voice-to-video-transcript
+cd ../voice-to-video-transcript
 source venv/bin/activate
-python -c "import openai, fastapi, streamlit; print('Voice-to-Video packages OK')" >> "$LOGFILE" 2>&1
+python -c "import openai, requests; print('Voice-to-Video packages OK')" >> "$LOGFILE" 2>&1
 if [ $? -ne 0 ]; then
     echo -e "${YELLOW}[WARNING] Some Voice-to-Video packages may have issues${NC}"
     echo "[WARNING] Voice-to-Video package validation failed" >> "$LOGFILE"
 fi
-cd ..
+cd ../setup
 
 echo -e "${GREEN}[OK] System validation complete${NC}"
 echo
 
-# Success message
+# Final summary
 echo -e "${GREEN}=========================================="
 echo -e "   EduTrack Setup Complete!"
 echo -e "==========================================${NC}"
 echo
-echo -e "${GREEN}[SUCCESS] All components installed successfully!${NC}"
-echo
 echo "Next steps:"
 echo "1. Run './start-all.sh' to start all services"
-echo "2. Run './quick-demo.sh' to open all interfaces"
-echo "3. Access Teacher Dashboard at: http://localhost:3000"
+echo "2. Access Teacher Dashboard at: http://localhost:3000"
+echo "3. Test system health with: python test-system.py"
+echo "4. Use './quick-demo.sh' to open all interfaces"
+echo "5. Run './stop-all.sh' to stop all services"
 echo
-echo "Troubleshooting:"
-echo "- Check logs in: $LOGFILE"
-echo "- View README.md for detailed instructions"
-echo "- Check individual component documentation"
+echo "Log files available in: ../logs/"
+echo "For troubleshooting, check: ../logs/setup_*.log"
 echo
-
+echo "System ready for evaluation!"
 if [ "$FFMPEG_MISSING" = true ]; then
-    echo -e "${YELLOW}[NOTE] FFmpeg is missing - Voice-to-Video features limited${NC}"
-    echo "Install from: https://ffmpeg.org/download.html"
-    echo
+    echo -e "${YELLOW}[Note] Install FFmpeg for full Voice-to-Video functionality${NC}"
 fi
-
-if [ -z "$OPENAI_KEY" ]; then
-    echo -e "${YELLOW}[NOTE] OpenAI API Key not configured - Voice-to-Video limited${NC}"
-    echo "Configure in: voice-to-video-transcript/.env"
-    echo
-fi
-
+echo
 echo "[INFO] Setup completed successfully at $(date)" >> "$LOGFILE"
 echo "Setup complete! Press any key to exit..."
 read -n 1 -s

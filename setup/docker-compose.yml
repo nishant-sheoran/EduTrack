@@ -4,13 +4,13 @@ services:
   # Engagement Monitor Service
   engagement-monitor:
     build:
-      context: ./clr_engage_montr
+      context: ../clr_engage_montr
       dockerfile: Dockerfile
     ports:
       - "8001:8001"
     volumes:
-      - ./logs:/app/logs
-      - ./clr_engage_montr/models:/app/models
+      - ../logs:/app/logs
+      - ../clr_engage_montr/models:/app/models
     environment:
       - PYTHONPATH=/app
       - CONFIDENCE_THRESHOLD=0.45
@@ -30,7 +30,7 @@ services:
   # Teacher Dashboard Service
   teacher-dashboard:
     build:
-      context: ./teacher-dashboard
+      context: ../teacher-dashboard
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
@@ -58,13 +58,13 @@ services:
   # Voice-to-Video Service
   voice-to-video:
     build:
-      context: ./voice-to-video-transcript
+      context: ../voice-to-video-transcript
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./logs:/app/logs
-      - ./voice-to-video-transcript/output:/app/output
+      - ../logs:/app/logs
+      - ../voice-to-video-transcript/output:/app/output
     environment:
       - PYTHONPATH=/app
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
@@ -90,8 +90,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./docker/health-dashboard.html:/usr/share/nginx/html/index.html:ro
+      - ../docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../docker/health-dashboard.html:/usr/share/nginx/html/index.html:ro
     depends_on:
       - engagement-monitor
       - teacher-dashboard
@@ -124,7 +124,7 @@ version: '3.8'
 services:
   engagement-monitor:
     volumes:
-      - ./clr_engage_montr:/app:ro
+      - ../clr_engage_montr:/app:ro
     environment:
       - DEBUG=true
       - RELOAD=true
@@ -132,14 +132,14 @@ services:
 
   teacher-dashboard:
     volumes:
-      - ./teacher-dashboard:/app:ro
+      - ../teacher-dashboard:/app:ro
     environment:
       - NODE_ENV=development
     command: ["npm", "run", "dev"]
 
   voice-to-video:
     volumes:
-      - ./voice-to-video-transcript:/app:ro
+      - ../voice-to-video-transcript:/app:ro
     environment:
       - DEBUG=true
       - RELOAD=true

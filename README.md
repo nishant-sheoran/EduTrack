@@ -16,10 +16,10 @@
 
 ### **🚀 One-Click Setup (Recommended)**
 1. **Download & Extract** this repository
-2. **Windows:** Right-click `setup-edutrack.bat` → "Run as Administrator"  
-   **Mac/Linux:** Run `chmod +x setup-edutrack.sh && ./setup-edutrack.sh`
+2. **Windows:** Right-click `setup/setup-edutrack.bat` → "Run as Administrator"  
+   **Mac/Linux:** Run `chmod +x setup/setup-edutrack.sh && ./setup/setup-edutrack.sh`
 3. **Wait 5-10 minutes** for automatic installation
-4. **Launch:** Run `start-all.bat` (Windows) or `./start-all.sh` (Mac/Linux)
+4. **Launch:** Run `setup/start-all.bat` (Windows) or `./setup/start-all.sh` (Mac/Linux)
 5. **Evaluate:** Browser opens automatically at http://localhost:3000
 
 ### **📋 Quick Access Points**
@@ -29,9 +29,9 @@
 - **Demo Visuals:** Check `docs/dash_stats.gif` and `docs/emotion_track.gif` for live system preview
 
 ### **🆘 If Setup Issues Occur**
-- **Run:** `python test-system.py` to validate system health (requires `pip install -r test-system-requirements.txt`)
+- **Run:** `python setup/test-system.py` to validate system health (requires `pip install -r setup/test-system-requirements.txt`)
 - **Fallback:** Pre-recorded demo at [Demo Video](http://bit.ly/4nFD8oJ) or check demo GIFs and report in `docs/report.pdf` folder
-- **Support:** Check [JUDGE_QUICK_START.md](JUDGE_QUICK_START.md) for troubleshooting
+- **Support:** Check [JUDGE_QUICK_START.md](setup/JUDGE_QUICK_START.md) for troubleshooting
 
 ---
 
@@ -161,11 +161,11 @@ git clone https://github.com/nishant-sheoran/EduTrack.git
 cd EduTrack
 
 # Run the automated setup script
-# Windows: Right-click "setup-edutrack.bat" → "Run as Administrator"
-# Mac/Linux: chmod +x setup-edutrack.sh && ./setup-edutrack.sh
+# Windows: Right-click "setup/setup-edutrack.bat" → "Run as Administrator"
+# Mac/Linux: chmod +x setup/setup-edutrack.sh && ./setup/setup-edutrack.sh
 
 # Wait 5-10 minutes for automatic installation
-# Then run: start-all.bat (Windows) or ./start-all.sh (Mac/Linux)
+# Then run: setup/start-all.bat (Windows) or ./setup/start-all.sh (Mac/Linux)
 ```
 
 ### **Manual Installation**

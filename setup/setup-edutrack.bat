@@ -17,15 +17,15 @@ if %errorLevel% neq 0 (
 :: Set colors for better visibility
 color 0A
 
-:: Create logs directory
-if not exist "logs" mkdir logs
-set LOGFILE=logs\setup_%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%.log
+:: Create logs directory in parent directory
+if not exist "..\logs" mkdir ..\logs
+set LOGFILE=..\logs\setup_%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%.log
 
 echo [INFO] Starting EduTrack setup at %date% %time% >> %LOGFILE%
 echo [INFO] Log file: %LOGFILE%
 
 :: Check system requirements
-echo [STEP 1/7] Checking system requirements...
+echo [STEP 1/8] Checking system requirements...
 echo [INFO] Checking system requirements... >> %LOGFILE%
 
 :: Check Python
@@ -60,7 +60,7 @@ echo [OK] System requirements check complete
 echo.
 
 :: Get OpenAI API Key
-echo [STEP 2/7] OpenAI API Key Configuration...
+echo [STEP 2/8] OpenAI API Key Configuration...
 echo [INFO] Configuring OpenAI API Key... >> %LOGFILE%
 
 set /p OPENAI_KEY="Enter your OpenAI API Key (press Enter to skip): "
@@ -74,10 +74,10 @@ if "%OPENAI_KEY%"=="" (
 echo.
 
 :: Setup Engagement Monitor
-echo [STEP 3/7] Setting up Classroom Engagement Monitor...
+echo [STEP 3/8] Setting up Classroom Engagement Monitor...
 echo [INFO] Setting up Engagement Monitor... >> %LOGFILE%
 
-cd clr_engage_montr
+cd ..\clr_engage_montr
 if %errorLevel% neq 0 (
     echo [ERROR] clr_engage_montr directory not found!
     echo [ERROR] clr_engage_montr directory not found >> %LOGFILE%
@@ -105,15 +105,15 @@ if %errorLevel% neq 0 (
 )
 
 echo [OK] Engagement Monitor setup complete
-cd ..
+cd ..\setup
 
 echo.
 
 :: Setup Teacher Dashboard
-echo [STEP 4/7] Setting up Teacher Dashboard...
+echo [STEP 4/8] Setting up Teacher Dashboard...
 echo [INFO] Setting up Teacher Dashboard... >> %LOGFILE%
 
-cd teacher-dashboard
+cd ..\teacher-dashboard
 if %errorLevel% neq 0 (
     echo [ERROR] teacher-dashboard directory not found!
     echo [ERROR] teacher-dashboard directory not found >> %LOGFILE%
@@ -138,15 +138,15 @@ if %errorLevel% neq 0 (
 )
 
 echo [OK] Teacher Dashboard setup complete
-cd ..
+cd ..\setup
 
 echo.
 
 :: Setup Voice-to-Video System
-echo [STEP 5/7] Setting up Voice-to-Video System...
+echo [STEP 5/8] Setting up Voice-to-Video System...
 echo [INFO] Setting up Voice-to-Video System... >> %LOGFILE%
 
-cd voice-to-video-transcript
+cd ..\voice-to-video-transcript
 if %errorLevel% neq 0 (
     echo [ERROR] voice-to-video-transcript directory not found!
     echo [ERROR] voice-to-video-transcript directory not found >> %LOGFILE%
@@ -182,7 +182,7 @@ if not "%OPENAI_KEY%"=="" (
 )
 
 echo [OK] Voice-to-Video setup complete
-cd ..
+cd ..\setup
 
 echo.
 
@@ -210,17 +210,27 @@ echo [INFO] Creating startup scripts... >> %LOGFILE%
 
 :: Create start-all.bat
 echo @echo off > start-all.bat
-echo echo Starting EduTrack Complete System... >> start-all.bat
+echo echo ========================================== >> start-all.bat
+echo echo    EduTrack - Starting All Services >> start-all.bat
+echo echo ========================================== >> start-all.bat
 echo echo. >> start-all.bat
 echo echo [1/3] Starting Engagement Monitor on port 8001... >> start-all.bat
-echo start "Engagement Monitor" cmd /k "cd clr_engage_montr && venv\Scripts\activate.bat && python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload" >> start-all.bat
-echo timeout /t 5 /nobreak ^> nul >> start-all.bat
+echo cd ..\clr_engage_montr >> start-all.bat
+echo call venv\Scripts\activate.bat >> start-all.bat
+echo start /b python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload >> start-all.bat
+echo cd ..\setup >> start-all.bat
+echo timeout /t 5 /nobreak >nul >> start-all.bat
 echo echo [2/3] Starting Teacher Dashboard on port 3000... >> start-all.bat
-echo start "Teacher Dashboard" cmd /k "cd teacher-dashboard && npm run dev" >> start-all.bat
-echo timeout /t 5 /nobreak ^> nul >> start-all.bat
+echo cd ..\teacher-dashboard >> start-all.bat
+echo start /b npm run dev >> start-all.bat
+echo cd ..\setup >> start-all.bat
+echo timeout /t 5 /nobreak >nul >> start-all.bat
 echo echo [3/3] Starting Voice-to-Video System on port 8000... >> start-all.bat
-echo start "Voice-to-Video" cmd /k "cd voice-to-video-transcript && venv\Scripts\activate.bat && python -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload" >> start-all.bat
-echo timeout /t 3 /nobreak ^> nul >> start-all.bat
+echo cd ..\voice-to-video-transcript >> start-all.bat
+echo call venv\Scripts\activate.bat >> start-all.bat
+echo start /b python -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload >> start-all.bat
+echo cd ..\setup >> start-all.bat
+echo timeout /t 3 /nobreak >nul >> start-all.bat
 echo echo. >> start-all.bat
 echo echo ========================================== >> start-all.bat
 echo echo    EduTrack System Started Successfully! >> start-all.bat
@@ -231,9 +241,12 @@ echo echo   Teacher Dashboard: http://localhost:3000 >> start-all.bat
 echo echo   Engagement Monitor: http://localhost:8001 >> start-all.bat
 echo echo   Voice-to-Video API: http://localhost:8000 >> start-all.bat
 echo echo. >> start-all.bat
-echo echo Press any key to open the dashboard... >> start-all.bat
-echo pause ^> nul >> start-all.bat
+echo echo Opening Teacher Dashboard in default browser... >> start-all.bat
+echo timeout /t 2 /nobreak >nul >> start-all.bat
 echo start http://localhost:3000 >> start-all.bat
+echo echo. >> start-all.bat
+echo echo Press any key to exit... >> start-all.bat
+echo pause >> start-all.bat
 
 :: Create quick-demo.bat
 echo @echo off > quick-demo.bat
@@ -243,12 +256,19 @@ echo echo ========================================== >> quick-demo.bat
 echo echo. >> quick-demo.bat
 echo echo Opening all EduTrack interfaces... >> quick-demo.bat
 echo start http://localhost:3000 >> quick-demo.bat
-echo timeout /t 2 /nobreak ^> nul >> quick-demo.bat
+echo timeout /t 2 /nobreak >nul >> quick-demo.bat
 echo start http://localhost:8001/docs >> quick-demo.bat
-echo timeout /t 2 /nobreak ^> nul >> quick-demo.bat
+echo timeout /t 2 /nobreak >nul >> quick-demo.bat
 echo start http://localhost:8000/docs >> quick-demo.bat
 echo echo. >> quick-demo.bat
-echo echo All interfaces opened in your browser! >> quick-demo.bat
+echo echo All interfaces opened in your default browser! >> quick-demo.bat
+echo echo. >> quick-demo.bat
+echo echo If browsers didn't open automatically, visit: >> quick-demo.bat
+echo echo   Teacher Dashboard: http://localhost:3000 >> quick-demo.bat
+echo echo   Engagement Monitor API: http://localhost:8001/docs >> quick-demo.bat
+echo echo   Voice-to-Video API: http://localhost:8000/docs >> quick-demo.bat
+echo echo. >> quick-demo.bat
+echo echo Press any key to exit... >> quick-demo.bat
 echo pause >> quick-demo.bat
 
 echo [OK] Startup scripts created
@@ -260,75 +280,63 @@ echo [INFO] Performing system validation... >> %LOGFILE%
 
 :: Check Python packages
 echo [INFO] Validating Python packages...
-cd clr_engage_montr
+cd ..\clr_engage_montr
 call venv\Scripts\activate.bat
 python -c "import cv2, fastapi, numpy; print('Engagement Monitor packages OK')" >> %LOGFILE% 2>&1
 if %errorLevel% neq 0 (
     echo [WARNING] Some Engagement Monitor packages may have issues
     echo [WARNING] Engagement Monitor package validation failed >> %LOGFILE%
 )
-cd ..
+cd ..\setup
 
-cd voice-to-video-transcript
+cd ..\voice-to-video-transcript
 call venv\Scripts\activate.bat
-python -c "import openai, fastapi, streamlit; print('Voice-to-Video packages OK')" >> %LOGFILE% 2>&1
+python -c "import openai, requests; print('Voice-to-Video packages OK')" >> %LOGFILE% 2>&1
 if %errorLevel% neq 0 (
     echo [WARNING] Some Voice-to-Video packages may have issues
     echo [WARNING] Voice-to-Video package validation failed >> %LOGFILE%
 )
-cd ..
+cd ..\setup
 
 echo [OK] System validation complete
 echo.
 
-:: Success message
+:: Final summary
 echo ==========================================
-echo    EduTrack Setup Complete! 
+echo    EduTrack Setup Complete!
 echo ==========================================
-echo.
-echo [SUCCESS] All components installed successfully!
 echo.
 echo Next steps:
-echo 1. Run "start-all.bat" to start all services
-echo 2. Run "quick-demo.bat" to open all interfaces
-echo 3. Access Teacher Dashboard at: http://localhost:3000
+echo 1. Run 'start-all.bat' to start all services
+echo 2. Access Teacher Dashboard at: http://localhost:3000
+echo 3. Test system health with: python test-system.py
+echo 4. Use 'quick-demo.bat' to open all interfaces
 echo.
-echo Troubleshooting:
-echo - Check logs in: %LOGFILE%
-echo - View README.md for detailed instructions
-echo - Check individual component documentation
+echo Log files available in: ..\logs\
+echo For troubleshooting, check: ..\logs\setup_*.log
 echo.
+echo System ready for evaluation!
 if "%FFMPEG_MISSING%"=="true" (
-    echo [NOTE] FFmpeg is missing - Voice-to-Video features limited
-    echo Install from: https://ffmpeg.org/download.html
-    echo.
+    echo [Note] Install FFmpeg for full Voice-to-Video functionality
 )
-if "%OPENAI_KEY%"=="" (
-    echo [NOTE] OpenAI API Key not configured - Voice-to-Video limited
-    echo Configure in: voice-to-video-transcript\.env
-    echo.
-)
+echo.
 echo [INFO] Setup completed successfully at %date% %time% >> %LOGFILE%
-echo Press any key to exit...
-pause >nul
-exit /b 0
+pause
+goto :eof
 
 :error_exit
 echo.
 echo ==========================================
-echo    Setup Failed! 
+echo    Setup Failed!
 echo ==========================================
-echo.
-echo [ERROR] EduTrack setup encountered errors.
 echo.
 echo Troubleshooting:
 echo 1. Check the log file: %LOGFILE%
-echo 2. Ensure you have administrator privileges
+echo 2. Ensure you have proper permissions
 echo 3. Verify Python 3.10+ and Node.js 18+ are installed
 echo 4. Check internet connection for downloads
 echo 5. Refer to README.md for manual setup
 echo.
 echo [ERROR] Setup failed at %date% %time% >> %LOGFILE%
-echo Press any key to exit...
-pause >nul
+pause
 exit /b 1 
