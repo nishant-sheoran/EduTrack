@@ -2,6 +2,8 @@
 
 A comprehensive educational monitoring system with real-time engagement tracking, voice-to-video transcript generation, and teacher dashboard management.
 
+[!Watch the Demo Video](output/demo%20video.mp4)
+
 ## 🏗️ System Architecture
 
 The EduTrack system consists of three main components:
