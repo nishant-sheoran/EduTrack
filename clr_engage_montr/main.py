@@ -118,6 +118,11 @@ def run_video_analysis(video_path):
 def get_realtime_engagement(subject: str = ""):
     return realtime_data
 
+# Return the health status of the api
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "Server is running"}
+
 # Start the processing thread
 def start_background_processing(video_path=0):  # <-- change to 0 for webcam
     t = threading.Thread(target=run_video_analysis, args=(video_path,), daemon=True)
