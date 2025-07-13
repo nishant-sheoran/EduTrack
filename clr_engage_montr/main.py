@@ -78,7 +78,7 @@ def run_video_analysis(video_path):
 
             emotion = emotion.lower()
             is_looking_away = abs(yaw) > YAW_THRESHOLD or abs(pitch) > PITCH_THRESHOLD
-            is_disengaged_emotion = emotion in ['surprise', 'fear', 'disgust', 'anger']
+            is_disengaged_emotion = emotion in ['surprise', 'sad', 'anger']
 
             current_tracker = dissociation_tracker[track_id]
             if is_looking_away or is_disengaged_emotion:
@@ -119,7 +119,7 @@ def get_realtime_engagement(subject: str = ""):
     return realtime_data
 
 # Start the processing thread
-def start_background_processing(video_path=r"test_images\test_video3.mp4"):  # <-- change to 0 for webcam
+def start_background_processing(video_path=0):  # <-- change to 0 for webcam
     t = threading.Thread(target=run_video_analysis, args=(video_path,), daemon=True)
     t.start()
 
