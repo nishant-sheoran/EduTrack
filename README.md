@@ -1,4 +1,4 @@
-# 🎓 EduTrack - Complete Educational Monitoring System
+# EduTrack - Complete Educational Monitoring System
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/nishant-sheoran/EduTrack)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -10,11 +10,11 @@
 
 > **A comprehensive educational monitoring system combining real-time engagement tracking, AI-powered content generation, and modern teacher dashboard analytics.**
 
-## 🏆 **For Competition Judges - Quick Evaluation**
+## **For Competition Judges - Quick Evaluation**
 
 **Want to evaluate EduTrack immediately? We've got you covered!**
 
-### **🚀 One-Click Setup (Recommended)**
+### **One-Click Setup (Recommended)**
 1. **Download & Extract** this repository
 2. **Windows:** Right-click `setup/setup-edutrack.bat` → "Run as Administrator"  
    **Mac/Linux:** Run `chmod +x setup/setup-edutrack.sh && ./setup/setup-edutrack.sh`
@@ -22,48 +22,48 @@
 4. **Launch:** Run `setup/start-all.bat` (Windows) or `./setup/start-all.sh` (Mac/Linux)
 5. **Evaluate:** Browser opens automatically at http://localhost:3000
 
-### **📋 Quick Access Points**
+### **Quick Access Points**
 - **Teacher Dashboard:** http://localhost:3000 (Main evaluation interface)
 - **Engagement Monitor API:** http://localhost:8001/docs (Computer vision demo)
 - **Voice-to-Video API:** http://localhost:8000/docs (AI content generation)
 - **Demo Visuals:** Check `docs/dash_stats.gif` and `docs/emotion_track.gif` for live system preview
 
-### **🆘 If Setup Issues Occur**
+### **If Setup Issues Occur**
 - **Run:** `python setup/test-system.py` to validate system health (requires `pip install -r setup/test-system-requirements.txt`)
 - **Fallback:** Pre-recorded demo at [Demo Video](http://bit.ly/4nFD8oJ) or check demo GIFs and report in `docs/report.pdf` folder
 - **Support:** Check [JUDGE_QUICK_START.md](setup/JUDGE_QUICK_START.md) for troubleshooting
 
 ---
 
-## 🚀 **What is EduTrack?**
+## **What is EduTrack?**
 
 EduTrack is a **next-generation educational technology platform** that transforms traditional classrooms into smart, data-driven learning environments. By combining **computer vision**, **artificial intelligence**, and **modern web technologies**, EduTrack provides educators with unprecedented insights into student engagement while automating educational content creation.
 
-### **🎯 Key Value Propositions**
+### **Key Value Propositions**
 
-- **📊 Real-time Engagement Analytics**: Monitor student attention, emotions, and participation live
-- **🎬 AI-Powered Content Generation**: Transform voice recordings into 3Blue1Brown-style educational videos
-- **📈 Comprehensive Teacher Dashboard**: Beautiful, responsive analytics interface with live KPIs
-- **🔄 Seamless Integration**: Three interconnected modules working in harmony
-- **⚡ Modern Architecture**: Built with cutting-edge technologies and best practices
+- **Real-time Engagement Analytics**: Monitor student attention, emotions, and participation live
+- **AI-Powered Content Generation**: Transform voice recordings into 3Blue1Brown-style educational videos
+- **Comprehensive Teacher Dashboard**: Beautiful, responsive analytics interface with live KPIs
+- **Seamless Integration**: Three interconnected modules working in harmony
+- **Modern Architecture**: Built with cutting-edge technologies and best practices
 
 ---
 
 ## 🎬 **Live System Demo**
 
-### **📊 Dashboard Live KPIs**
+### **Dashboard Live KPIs**
 *Real-time dashboard showing live engagement metrics from classroom monitoring models*
 
 ![Dashboard Statistics](docs/dash_stats.gif)
 
-### **📈 Real-time Analytics**
+### **Real-time Analytics**
 *Live emotion tracking and engagement analytics with beautiful Recharts visualizations*
 
 ![Emotion Tracking](docs/emotion_track.gif)
 
 ---
 
-## 🏗️ **System Architecture**
+## **System Architecture**
 
 EduTrack follows a **microservices architecture** with three independent, scalable modules:
 
@@ -99,9 +99,9 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 
 ---
 
-## 🎯 **Core Features**
+## **Core Features**
 
-### 1. 📊 **Classroom Engagement Monitor**
+### 1. **Classroom Engagement Monitor**
 
 **Real-time AI-powered student engagement tracking**
 
@@ -113,7 +113,7 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 
 **Technology Stack**: Python, FastAPI, OpenCV, YOLOv8, OpenVINO, DeepSORT
 
-### 2. 🎓 **Teacher Dashboard**
+### 2. **Teacher Dashboard**
 
 **Modern, responsive web interface for educators**
 
@@ -128,7 +128,7 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 
 > **💡 See it in action**: Check `docs/dash_stats.gif` for live dashboard KPIs and `docs/emotion_track.gif` for real-time analytics visualization
 
-### 3. 🎙️ **Voice-to-Video Transcript System**
+### 3. **Voice-to-Video Transcript System**
 
 **AI-powered educational content generation**
 
@@ -144,7 +144,7 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 
 ---
 
-## 🚀 **Quick Start Guide**
+## **Quick Start Guide**
 
 ### **Prerequisites**
 
@@ -153,7 +153,7 @@ EduTrack follows a **microservices architecture** with three independent, scalab
 - **FFmpeg** (required for audio processing)
 - **OpenAI API Key** (for voice-to-video features)
 
-### **⚡ One-Command Setup**
+### **One-Command Setup**
 
 ```bash
 # Clone the repository
@@ -186,7 +186,7 @@ pip install -r requirements.txt
 python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
-**✅ Service available at**: `http://localhost:8001`
+**Service available at**: `http://localhost:8001`
 
 #### **2. Teacher Dashboard**
 
@@ -200,7 +200,7 @@ npm install
 npm run dev
 ```
 
-**✅ Dashboard available at**: `http://localhost:3000`
+**Dashboard available at**: `http://localhost:3000`
 
 #### **3. Voice-to-Video System**
 
@@ -221,11 +221,11 @@ echo "OPENAI_API_KEY=your_api_key_here" > .env
 python -m uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-**✅ Service available at**: `http://localhost:8000`
+**Service available at**: `http://localhost:8000`
 
 ---
 
-## 🔧 **Configuration**
+## **Configuration**
 
 ### **Environment Variables**
 
@@ -260,7 +260,7 @@ NEXT_PUBLIC_VOICE_API_URL=http://localhost:8000
 
 ---
 
-## 🛠️ **Build & Test**
+## **Build & Test**
 
 ### **Development Mode**
 
@@ -327,7 +327,7 @@ docker-compose up -d
 
 ---
 
-## 📊 **Usage Examples**
+## **Usage Examples**
 
 ### **API Integration**
 
@@ -377,7 +377,7 @@ const { kpis, loading, error } = useRealTimeKPIs();
 ```
 
 
-## 🔒 **Security & Privacy**
+## **Security & Privacy**
 
 ### **Data Protection**
 
@@ -395,14 +395,14 @@ const { kpis, loading, error } = useRealTimeKPIs();
 
 ---
 
-## 📚 **Documentation**
+## **Documentation**
 
 ### **Complete Documentation**
 
-- **📋 [File Inventory](docs/File_Inventory.md)** - Comprehensive file listing and API documentation
-- **🏗️ [Architecture Overview](docs/Architecture.md)** - System design and data flow diagrams
-- **📊 [Project Report](docs/report.pdf)** - Complete project documentation and technical analysis
-- **🎯 [Inline Improvements](docs/Inline_Improvements.md)** - Code documentation and enhancement suggestions
+- **[File Inventory](docs/File_Inventory.md)** - Comprehensive file listing and API documentation
+- **[Architecture Overview](docs/Architecture.md)** - System design and data flow diagrams
+- **[Project Report](docs/report.pdf)** - Complete project documentation and technical analysis
+- **[Inline Improvements](docs/Inline_Improvements.md)** - Code documentation and enhancement suggestions
 
 ### **Quick References**
 
@@ -412,7 +412,7 @@ const { kpis, loading, error } = useRealTimeKPIs();
 
 ---
 
-## 🎯 **Use Cases**
+## **Use Cases**
 
 ### **Educational Institutions**
 
@@ -430,30 +430,30 @@ const { kpis, loading, error } = useRealTimeKPIs();
 
 ---
 
-## 🛣️ **Roadmap**
+## **Roadmap**
 
-### **Phase 1: Core Platform** ✅
+### **Phase 1: Core Platform** 
 - [x] Real-time face detection and tracking
 - [x] Emotion recognition with OpenVINO
 - [x] Teacher dashboard with live KPIs
 - [x] Voice-to-video content generation
 - [x] API integration between modules
 
-### **Phase 2: Advanced Features** 🚧
+### **Phase 2: Advanced Features** 
 - [ ] Multi-language support (Spanish, French, German)
 - [ ] Advanced analytics and reporting
 - [ ] Mobile app for teachers
 - [ ] Integration with LMS platforms
 - [ ] Cloud deployment options
 
-### **Phase 3: AI Enhancement** 📋
+### **Phase 3: AI Enhancement** 
 - [ ] Personalized learning recommendations
 - [ ] Predictive analytics for student performance
 - [ ] Advanced natural language processing
 - [ ] Automated assessment generation
 - [ ] Intelligent content curation
 
-### **Phase 4: Platform Enhancement** 📋
+### **Phase 4: Platform Enhancement** 
 - [ ] Multi-user support
 - [ ] Enhanced security features
 - [ ] Customizable interface
@@ -491,35 +491,35 @@ We welcome contributions from the community! Here's how to get started:
 
 ---
 
-## 📊 **Project Statistics**
+## **Project Statistics**
 
-- **📁 Total Files**: 106 source files
-- **💾 Total Size**: ~1.2GB (including models and generated content)
-- **📝 Lines of Code**: ~8,500 lines (excluding generated/binary files)
-- **🔧 Dependencies**: 150+ packages across all modules
-- **🎯 Supported Formats**: Audio (MP3, WAV, M4A), Video (MP4), Documents (PDF, MD)
+- **Total Files**: 106 source files
+- **Total Size**: ~1.2GB (including models and generated content)
+- **Lines of Code**: ~8,500 lines (excluding generated/binary files)
+- **Dependencies**: 150+ packages across all modules
+- **Supported Formats**: Audio (MP3, WAV, M4A), Video (MP4), Documents (PDF, MD)
 
 
 ---
 
-## 📞 **Support**
+## **Support**
 
 ### **Getting Help**
 
-- **📋 GitHub Issues**: [Report bugs and request features](https://github.com/nishant-sheoran/EduTrack/issues)
-- **📚 Documentation**: Check the docs/ folder for detailed documentation
-- **💬 Discussions**: Use GitHub Discussions for questions and community support
+- **GitHub Issues**: [Report bugs and request features](https://github.com/nishant-sheoran/EduTrack/issues)
+- **Documentation**: Check the docs/ folder for detailed documentation
+- **Discussions**: Use GitHub Discussions for questions and community support
 
 ### **Community**
 
-- **👥 Contributors**: Welcome new contributors
-- **⭐ GitHub Stars**: Star us to support the project
-- **🍴 Forks**: Fork and contribute to development
-- **💬 Discussions**: Join our community discussions
+- **Contributors**: Welcome new contributors
+- **GitHub Stars**: Star us to support the project
+- **Forks**: Fork and contribute to development
+- **Discussions**: Join our community discussions
 
 ---
 
-## 🙏 **Acknowledgments**
+## **Acknowledgments**
 
 ### **Technology Partners**
 
@@ -544,7 +544,7 @@ We welcome contributions from the community! Here's how to get started:
 
 ---
 
-*Last Updated: July 2025*  
-*Version: 1.0.0*
+*Last Updated: March 2026*  
+*Version: 1.0.1*
 
 </div>
